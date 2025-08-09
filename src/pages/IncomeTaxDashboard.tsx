@@ -54,13 +54,18 @@ const IncomeTaxDashboard: React.FC = () => {
       let rentalTotal = 0;
       try {
         const savedRentalData = localStorage.getItem(rentalIncomeSource);
-        const properties: { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; }[] = savedRentalData ? JSON.parse(savedRentalData) : [];
+        const properties: { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; interestOnLoan: number | string; }[] = savedRentalData ? JSON.parse(savedRentalData) : [];
         
-        const totalGrossRent = properties.reduce((total, prop) => total + ((Number(prop.monthlyRent) || 0) * (Number(prop.monthsRented) || 0)), 0);
-        const totalPropertyTax = properties.reduce((total, prop) => total + (Number(prop.propertyTax) || 0), 0);
-        const netAnnualValue = totalGrossRent - totalPropertyTax;
-        const standardDeduction = netAnnualValue > 0 ? netAnnualValue * 0.3 : 0;
-        rentalTotal = netAnnualValue - standardDeduction;
+        const totalNetIncome = properties.reduce((total, prop) => {
+            const gav = (Number(prop.monthlyRent) || 0) * (Number(prop.monthsRented) || 0);
+            const propertyTax = Number(prop.propertyTax) || 0;
+            const nav = gav - propertyTax;
+            const standardDeduction = nav > 0 ? nav * 0.3 : 0;
+            const interestOnLoan = Number(prop.interestOnLoan) || 0;
+            const taxableIncome = nav - standardDeduction - interestOnLoan;
+            return total + taxableIncome;
+        }, 0);
+        rentalTotal = totalNetIncome;
 
       } catch {}
       setTotalRentalIncome(rentalTotal);
