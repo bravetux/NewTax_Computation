@@ -123,12 +123,18 @@ const FDIncomePage: React.FC = () => {
         giftingData[selectedRecipient] = {};
       }
 
-      giftingData[selectedRecipient].fdIncome = totalInterest;
+      const currentTotalInterest = fds.reduce((total, fd) => total + (Number(fd.interest) || 0), 0);
+      giftingData[selectedRecipient].fdIncome = (Number(giftingData[selectedRecipient].fdIncome) || 0) + currentTotalInterest;
 
       localStorage.setItem(GIFTING_RECIPIENTS_KEY, JSON.stringify(giftingData));
       window.dispatchEvent(new Event('storage'));
 
-      showSuccess(`FD Interest of ₹${totalInterest.toLocaleString('en-IN')} assigned to ${RECIPIENT_OPTIONS[selectedRecipient]}. View on the Gifting page.`);
+      showSuccess(`FD Interest of ₹${currentTotalInterest.toLocaleString('en-IN')} assigned to ${RECIPIENT_OPTIONS[selectedRecipient]}. View on the Gifting page.`);
+      
+      const resetFds = fds.map(fd => ({ ...fd, interest: "" }));
+      setFds(resetFds);
+      setSelectedRecipient("");
+
     } catch (error) {
       showError("An error occurred while assigning the income.");
     }
@@ -163,7 +169,7 @@ const FDIncomePage: React.FC = () => {
           <CardHeader><CardTitle>Gift This Income</CardTitle></CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Assign the total FD interest income to a family member on the Gifting page.
+              Action to be taken is Gift the entire the Principal Capital to the Family Member, so that future income is Zero.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Select onValueChange={(value) => setSelectedRecipient(value as keyof typeof RECIPIENT_OPTIONS)} value={selectedRecipient}>
