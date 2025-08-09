@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Download, Upload, PlusCircle, ArrowLeft } from "lucide-react";
+import { Download, Upload, PlusCircle, ArrowLeft, Gift } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { showSuccess, showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FD {
   bankName: string;
@@ -17,6 +18,14 @@ interface FD {
 }
 
 const LOCAL_STORAGE_KEY = "dyad-fd-income";
+const GIFTING_RECIPIENTS_KEY = "dyad-gifting-recipients-data";
+const RECIPIENT_OPTIONS = {
+  spouse: "Spouse",
+  mother: "Mother",
+  father: "Father",
+  kid1: "Kid 1",
+  kid2: "Kid 2",
+};
 
 const FDIncomePage: React.FC = () => {
   const [fds, setFds] = useState<FD[]>(() => {
@@ -32,6 +41,7 @@ const FDIncomePage: React.FC = () => {
     return Array(5).fill({ bankName: "", accountNo: "", interest: "" });
   });
 
+  const [selectedRecipient, setSelectedRecipient] = useState<keyof typeof RECIPIENT_OPTIONS | "">("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -112,6 +122,31 @@ const FDIncomePage: React.FC = () => {
     event.target.value = "";
   };
 
+  const handleGiftInterest = () => {
+    if (!selectedRecipient) {
+      showError("Please select a recipient to gift the income to.");
+      return;
+    }
+
+    try {
+      const giftingDataRaw = localStorage.getItem(GIFTING_RECIPIENTS_KEY);
+      const giftingData = giftingDataRaw ? JSON.parse(giftingDataRaw) : {};
+
+      if (!giftingData[selectedRecipient]) {
+        giftingData[selectedRecipient] = {};
+      }
+
+      giftingData[selectedRecipient].fdIncome = totalInterest;
+
+      localStorage.setItem(GIFTING_RECIPIENTS_KEY, JSON.stringify(giftingData));
+      window.dispatchEvent(new Event('storage'));
+
+      showSuccess(`FD Interest of ₹${totalInterest.toLocaleString('en-IN')} assigned to ${RECIPIENT_OPTIONS[selectedRecipient]}. View on the Gifting page.`);
+    } catch (error) {
+      showError("An error occurred while assigning the income.");
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
@@ -134,6 +169,30 @@ const FDIncomePage: React.FC = () => {
           <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
             <p className="text-xl font-semibold">Total FD Interest Income: ₹{totalInterest.toLocaleString("en-IN")}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader><CardTitle>Gift This Income</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Assign the total FD interest income to a family member on the Gifting page.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Select onValueChange={(value) => setSelectedRecipient(value as keyof typeof RECIPIENT_OPTIONS)} value={selectedRecipient}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select a Recipient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(RECIPIENT_OPTIONS).map(([key, name]) => (
+                    <SelectItem key={key} value={key}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={handleGiftInterest} disabled={!selectedRecipient || totalInterest <= 0}>
+                <Gift className="mr-2 h-4 w-4" /> Assign to Recipient
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import GiftingRecipientCard from '@/components/GiftingRecipientCard';
 import { calculateTax, DetailedIncome, TaxCalculationResult } from '@/utils/taxCalculator';
@@ -15,14 +15,54 @@ interface Recipient {
   taxDetails: TaxCalculationResult | null;
 }
 
+const LOCAL_STORAGE_KEY = "dyad-gifting-recipients-data";
+
 const GiftingPage: React.FC = () => {
-  const [recipients, setRecipients] = useState<Record<string, Recipient>>({
-    spouse: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-    mother: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-    father: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-    kid1: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-    kid2: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+  const [recipients, setRecipients] = useState<Record<string, Recipient>>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed === 'object' && parsed !== null && 'spouse' in parsed) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load gifting data from localStorage", error);
+    }
+    return {
+      spouse: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+      mother: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+      father: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+      kid1: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+      kid2: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+    };
   });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(recipients));
+  }, [recipients]);
+
+  useEffect(() => {
+    const syncState = () => {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        try {
+          setRecipients(JSON.parse(saved));
+        } catch (e) {
+          console.error("Error parsing gifting data on sync", e);
+        }
+      }
+    };
+
+    window.addEventListener('storage', syncState);
+    window.addEventListener('focus', syncState);
+
+    return () => {
+      window.removeEventListener('storage', syncState);
+      window.removeEventListener('focus', syncState);
+    };
+  }, []);
 
   const handleStateChange = (recipient: keyof typeof recipients, field: keyof Recipient, value: any) => {
     setRecipients(prev => ({
@@ -68,24 +108,24 @@ const GiftingPage: React.FC = () => {
               key={key}
               name={key.charAt(0).toUpperCase() + key.slice(1).replace(/[0-9]/g, ' $&')}
               age={recipient.age}
-              onAgeChange={(e) => handleStateChange(key, 'age', e.target.value)}
+              onAgeChange={(e) => handleStateChange(key as keyof typeof recipients, 'age', e.target.value)}
               
               salary={recipient.salary}
-              onSalaryChange={(e) => handleStateChange(key, 'salary', e.target.value)}
+              onSalaryChange={(e) => handleStateChange(key as keyof typeof recipients, 'salary', e.target.value)}
               isSalaried={recipient.isSalaried}
-              onIsSalariedChange={(checked) => handleStateChange(key, 'isSalaried', checked)}
+              onIsSalariedChange={(checked) => handleStateChange(key as keyof typeof recipients, 'isSalaried', checked)}
 
               fdIncome={recipient.fdIncome}
-              onFdIncomeChange={(e) => handleStateChange(key, 'fdIncome', e.target.value)}
+              onFdIncomeChange={(e) => handleStateChange(key as keyof typeof recipients, 'fdIncome', e.target.value)}
               bondIncome={recipient.bondIncome}
-              onBondIncomeChange={(e) => handleStateChange(key, 'bondIncome', e.target.value)}
+              onBondIncomeChange={(e) => handleStateChange(key as keyof typeof recipients, 'bondIncome', e.target.value)}
               dividendIncome={recipient.dividendIncome}
-              onDividendIncomeChange={(e) => handleStateChange(key, 'dividendIncome', e.target.value)}
+              onDividendIncomeChange={(e) => handleStateChange(key as keyof typeof recipients, 'dividendIncome', e.target.value)}
 
               stcg={recipient.stcg}
-              onStcgChange={(e) => handleStateChange(key, 'stcg', e.target.value)}
+              onStcgChange={(e) => handleStateChange(key as keyof typeof recipients, 'stcg', e.target.value)}
               ltcg={recipient.ltcg}
-              onLtcgChange={(e) => handleStateChange(key, 'ltcg', e.target.value)}
+              onLtcgChange={(e) => handleStateChange(key as keyof typeof recipients, 'ltcg', e.target.value)}
 
               taxDetails={recipient.taxDetails}
               onComputeTax={() => handleComputeTax(key as keyof typeof recipients)}
