@@ -3,35 +3,32 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calculator } from 'lucide-react';
 
 interface GiftingRecipientCardProps {
   name: string;
   age: number | string;
   onAgeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  showWorkingToggle: boolean;
-  isWorking?: boolean;
-  onIsWorkingChange?: (checked: boolean) => void;
-  grossIncome?: number | string;
-  onGrossIncomeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  grossIncome: number | string;
+  onGrossIncomeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isSalaried: boolean;
+  onIsSalariedChange: (checked: boolean) => void;
+  taxLiable: number | null;
+  onComputeTax: () => void;
 }
 
 const GiftingRecipientCard: React.FC<GiftingRecipientCardProps> = ({
   name,
   age,
   onAgeChange,
-  showWorkingToggle,
-  isWorking,
-  onIsWorkingChange,
   grossIncome,
   onGrossIncomeChange,
+  isSalaried,
+  onIsSalariedChange,
+  taxLiable,
+  onComputeTax,
 }) => {
-  const isAdult = Number(age) >= 18;
-  const income = Number(grossIncome) || 0;
-  const incomeLimit = 1200000;
-  const isIncomeBelowLimit = income < incomeLimit;
-
   return (
     <Card>
       <CardHeader>
@@ -49,58 +46,38 @@ const GiftingRecipientCard: React.FC<GiftingRecipientCardProps> = ({
             min="0"
           />
         </div>
+        
+        <div>
+          <Label htmlFor={`income-${name}`}>Gross Annual Income</Label>
+          <Input
+            id={`income-${name}`}
+            type="number"
+            value={grossIncome}
+            onChange={onGrossIncomeChange}
+            placeholder="e.g. 500000"
+            min="0"
+          />
+        </div>
 
-        {isAdult && (
-          <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
-            <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <AlertDescription className="text-green-700 dark:text-green-400">
-              Gifting is allowed.
-            </AlertDescription>
-          </Alert>
-        )}
+        <div className="flex items-center space-x-2">
+          <Switch
+            id={`salaried-${name}`}
+            checked={isSalaried}
+            onCheckedChange={onIsSalariedChange}
+          />
+          <Label htmlFor={`salaried-${name}`}>Is this income from salary/pension?</Label>
+        </div>
 
-        {showWorkingToggle && onIsWorkingChange && (
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id={`working-${name}`}
-                checked={isWorking}
-                onCheckedChange={onIsWorkingChange}
-              />
-              <Label htmlFor={`working-${name}`}>Is Working?</Label>
+        <Button onClick={onComputeTax} className="w-full">
+          <Calculator className="mr-2 h-4 w-4" /> Compute Tax
+        </Button>
+
+        {taxLiable !== null && (
+          <div className="pt-2">
+            <Label>Tax Liability</Label>
+            <div className="text-lg font-bold p-2 bg-muted rounded-md text-center">
+              ₹{taxLiable.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
-            {isWorking && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor={`income-${name}`}>Gross Annual Income</Label>
-                  <Input
-                    id={`income-${name}`}
-                    type="number"
-                    value={grossIncome}
-                    onChange={onGrossIncomeChange}
-                    placeholder="e.g. 500000"
-                    min="0"
-                  />
-                </div>
-                {String(grossIncome).length > 0 && (
-                  isIncomeBelowLimit ? (
-                    <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
-                      <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
-                      <AlertDescription className="text-green-700 dark:text-green-400">
-                        Income is below ₹12L. Gifting is a good option.
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Income is above ₹12L. Gifting may not be the most tax-efficient option.
-                      </AlertDescription>
-                    </Alert>
-                  )
-                )}
-              </div>
-            )}
           </div>
         )}
       </CardContent>
