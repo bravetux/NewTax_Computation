@@ -57,7 +57,7 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
         <NavLink
-          to="/tax-dashboard"
+          to="/income-summary"
           className={({isActive}) => mainNavLinkClass(isActive)}
           end
         >
@@ -67,7 +67,7 @@ const Sidebar = () => {
         
         <div className="space-y-1 pt-2">
           <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Income</p>
-          <a href="/tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
+          <a href="/income-summary#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
           <NavLink to="/rental-income" className={incomeNavLinkClass}><Home className="mr-3 h-4 w-4" />Rental</NavLink>
           <NavLink to="/fd-income" className={incomeNavLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</NavLink>
           <NavLink to="/bonds" className={incomeNavLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</NavLink>
