@@ -138,7 +138,7 @@ const BondsPage: React.FC = () => {
       const giftingData = giftingDataRaw ? JSON.parse(giftingDataRaw) : {};
 
       if (!giftingData[selectedRecipient]) {
-        giftingData[selectedRecipient] = {};
+        giftingData[selectedRecipient] = { bondIncome: 0 };
       }
 
       giftingData[selectedRecipient].bondIncome = totalIncome;
@@ -147,6 +147,11 @@ const BondsPage: React.FC = () => {
       window.dispatchEvent(new Event('storage'));
 
       showSuccess(`Bond Interest of ₹${totalIncome.toLocaleString('en-IN')} assigned to ${RECIPIENT_OPTIONS[selectedRecipient]}. View on the Gifting page.`);
+
+      const resetBonds = bonds.map(bond => ({ ...bond, income: "" }));
+      setBonds(resetBonds);
+      setSelectedRecipient("");
+
     } catch (error) {
       showError("An error occurred while assigning the income.");
     }
@@ -181,7 +186,7 @@ const BondsPage: React.FC = () => {
           <CardHeader><CardTitle>Gift This Income</CardTitle></CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Assign the total bond interest income to a family member on the Gifting page.
+              Action to be taken is Gift the entire the Principal Capital to the Family Member, so that future income is Zero.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Select onValueChange={(value) => setSelectedRecipient(value as keyof typeof RECIPIENT_OPTIONS)} value={selectedRecipient}>

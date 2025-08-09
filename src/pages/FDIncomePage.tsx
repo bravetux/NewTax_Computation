@@ -120,11 +120,11 @@ const FDIncomePage: React.FC = () => {
       const giftingData = giftingDataRaw ? JSON.parse(giftingDataRaw) : {};
 
       if (!giftingData[selectedRecipient]) {
-        giftingData[selectedRecipient] = {};
+        giftingData[selectedRecipient] = { fdIncome: 0 };
       }
 
       const currentTotalInterest = fds.reduce((total, fd) => total + (Number(fd.interest) || 0), 0);
-      giftingData[selectedRecipient].fdIncome = (Number(giftingData[selectedRecipient].fdIncome) || 0) + currentTotalInterest;
+      giftingData[selectedRecipient].fdIncome = currentTotalInterest;
 
       localStorage.setItem(GIFTING_RECIPIENTS_KEY, JSON.stringify(giftingData));
       window.dispatchEvent(new Event('storage'));
