@@ -13,10 +13,10 @@ interface Recipient {
 const GiftingPage: React.FC = () => {
   const [recipients, setRecipients] = useState<Record<string, Recipient>>({
     spouse: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
-    kid1: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
-    kid2: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
     mother: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
     father: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
+    kid1: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
+    kid2: { age: '', grossIncome: '', isSalaried: false, taxLiable: null },
   });
 
   const handleStateChange = (recipient: keyof typeof recipients, field: keyof Recipient, value: any) => {
