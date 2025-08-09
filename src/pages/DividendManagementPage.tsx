@@ -55,17 +55,38 @@ const DividendManagementPage: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const processData = (data: any[]) => {
-      const getVal = (row: any, keys: string[]) => {
-        const rowKey = Object.keys(row).find(k => keys.includes(k.toLowerCase().trim()));
-        return rowKey ? row[rowKey] : undefined;
+    const processData = (data: any[], headers: string[]) => {
+      if (!data || data.length === 0) {
+        showError("The file is empty or could not be read.");
+        return;
+      }
+
+      const lowerCaseHeaders = headers.map(h => h.toLowerCase().trim());
+
+      const findHeader = (possibleNames: string[]): string | undefined => {
+        for (const name of possibleNames) {
+          const headerIndex = lowerCaseHeaders.indexOf(name);
+          if (headerIndex !== -1) {
+            return headers[headerIndex]; // Return original case header
+          }
+        }
+        return undefined;
       };
+
+      const dateHeader = findHeader(['date']);
+      const particularsHeader = findHeader(['particulars']);
+      const amountHeader = findHeader(['amount', 'credit']);
+
+      if (!dateHeader || !particularsHeader || !amountHeader) {
+        showError("Import failed. The file must contain columns for 'Date', 'Particulars', and 'Amount' (or 'Credit'). Please check the headers.");
+        return;
+      }
 
       const parsedData = data
         .map((row: any) => {
-          const date = getVal(row, ['date']);
-          const particulars = getVal(row, ['particulars']);
-          const amount = getVal(row, ['amount', 'credit']);
+          const date = row[dateHeader];
+          const particulars = row[particularsHeader];
+          const amount = row[amountHeader];
 
           let dateString = '';
           if (date instanceof Date) {
@@ -89,7 +110,7 @@ const DividendManagementPage: React.FC = () => {
         setDividends(parsedData);
         showSuccess(`${parsedData.length} dividend records imported successfully!`);
       } else {
-        showError("No valid dividend data found. Please ensure your file has columns named 'Date', 'Particulars', and 'Amount' (or 'Credit').");
+        showError("No valid dividend data found in the file, even though headers were correct. Please check the data rows.");
       }
     };
 
@@ -97,7 +118,10 @@ const DividendManagementPage: React.FC = () => {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        complete: (result) => processData(result.data),
+        complete: (result) => {
+          const headers = result.meta.fields || [];
+          processData(result.data, headers);
+        },
         error: () => showError("Failed to parse CSV."),
       });
     } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
@@ -109,7 +133,8 @@ const DividendManagementPage: React.FC = () => {
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           const json = XLSX.utils.sheet_to_json(worksheet);
-          processData(json);
+          const headers = json.length > 0 ? Object.keys(json[0]) : [];
+          processData(json, headers);
         } catch (err) {
           console.error("File parsing error:", err);
           showError("Failed to parse the Excel file. It might be corrupted or in an unsupported format.");
