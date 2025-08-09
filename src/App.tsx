@@ -10,6 +10,8 @@ import CapitalGainsPage from "./pages/CapitalGainsPage";
 import Layout from "./components/Layout";
 import DematGainsPage from "./pages/DematGainsPage";
 import MutualFundGainsPage from "./pages/MutualFundGainsPage";
+import DividendsPage from "./pages/DividendsPage";
+import DividendManagementPage from "./pages/DividendManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,14 @@ const App = () => (
             <Route
               path="/mutual-fund-gains"
               element={<MutualFundGainsPage />}
+            />
+            <Route
+              path="/dividends"
+              element={<DividendsPage />}
+            />
+            <Route
+              path="/dividends/:source"
+              element={<DividendManagementPage />}
             />
           </Route>
 
