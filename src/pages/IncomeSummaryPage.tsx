@@ -10,6 +10,7 @@ const bondIncomeSource = "dyad-bonds-income";
 const fdIncomeSource = "dyad-fd-income";
 const rentalIncomeSource = "dyad-rental-income";
 const salaryIncomeSource = "dyad-salary-income";
+const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-broker2-dividends"];
 
 const IncomeSummaryPage: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>(() => {
@@ -23,6 +24,7 @@ const IncomeSummaryPage: React.FC = () => {
   const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
+  const [totalDividendIncome, setTotalDividendIncome] = useState(0);
 
   useEffect(() => {
     localStorage.setItem(salaryIncomeSource, JSON.stringify(salaryIncome));
@@ -66,6 +68,17 @@ const IncomeSummaryPage: React.FC = () => {
 
       } catch {}
       setTotalRentalIncome(rentalTotal);
+
+      // Dividend Income
+      let dividendTotal = 0;
+      dividendSources.forEach(key => {
+        try {
+          const savedData = localStorage.getItem(key);
+          const items: { amount: number }[] = savedData ? JSON.parse(savedData) : [];
+          dividendTotal += items.reduce((sum, item) => sum + (item.amount || 0), 0);
+        } catch {}
+      });
+      setTotalDividendIncome(dividendTotal);
     };
 
     calculateTotals();
@@ -84,7 +97,8 @@ const IncomeSummaryPage: React.FC = () => {
     (Number(salaryIncome) || 0) +
     totalRentalIncome +
     totalFdIncome +
-    totalBondIncome;
+    totalBondIncome +
+    totalDividendIncome;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -135,6 +149,15 @@ const IncomeSummaryPage: React.FC = () => {
               <p className="text-2xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
               <Link to="/bonds">
                 <Button variant="outline">Manage Bonds <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Dividend Income</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold mb-4">₹{totalDividendIncome.toLocaleString("en-IN")}</p>
+              <Link to="/dividends">
+                <Button variant="outline">Manage Dividends <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
             </CardContent>
           </Card>
