@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound";
 import IncomeTaxDashboard from "./pages/IncomeTaxDashboard";
 import CapitalGainsPage from "./pages/CapitalGainsPage";
 import Layout from "./components/Layout";
+import DematGainsPage from "./pages/DematGainsPage";
+import MutualFundGainsPage from "./pages/MutualFundGainsPage";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,14 @@ const App = () => (
             <Route
               path="/capital-gains"
               element={<CapitalGainsPage />}
+            />
+            <Route
+              path="/demat-gains"
+              element={<DematGainsPage />}
+            />
+            <Route
+              path="/mutual-fund-gains"
+              element={<MutualFundGainsPage />}
             />
           </Route>
 

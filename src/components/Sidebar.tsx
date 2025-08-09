@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Wallet,
@@ -7,11 +7,20 @@ import {
   FileText,
   PieChart,
   TrendingUp,
+  Building,
+  AreaChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
-  const mainNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+  const location = useLocation();
+
+  const isCapitalGainsActive = 
+    location.pathname.startsWith('/capital-gains') ||
+    location.pathname.startsWith('/demat-gains') ||
+    location.pathname.startsWith('/mutual-fund-gains');
+
+  const mainNavLinkClass = (isActive: boolean) =>
     cn(
       "flex items-center px-3 py-2 text-sm font-medium rounded-md",
       isActive
@@ -19,11 +28,18 @@ const Sidebar = () => {
         : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
     );
   
+  const capitalGainsParentClass = cn(
+    "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+    isCapitalGainsActive
+      ? "bg-primary text-primary-foreground"
+      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+  );
+
   const subNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md",
+      "flex items-center pl-11 pr-3 py-2 text-sm font-medium rounded-md",
       isActive
-        ? "text-primary dark:text-primary-foreground"
+        ? "text-primary dark:text-primary-foreground font-semibold"
         : "text-gray-600 dark:text-gray-400",
       "hover:bg-gray-200 dark:hover:bg-gray-700"
     );
@@ -38,37 +54,35 @@ const Sidebar = () => {
       <nav className="flex-1 px-2 py-4 space-y-1">
         <NavLink
           to="/income-tax-dashboard"
-          className={mainNavLinkClass}
+          className={({isActive}) => mainNavLinkClass(isActive)}
           end
         >
           <LayoutDashboard className="mr-3 h-5 w-5" />
           Dashboard
         </NavLink>
+        
+        <div className="space-y-1 pt-2">
+          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Income</p>
+          <a href="/income-tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
+          <a href="/income-tax-dashboard#rental-income" className={hashLinkClass}><Home className="mr-3 h-4 w-4" />Rental</a>
+          <a href="/income-tax-dashboard#fd-income" className={hashLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</a>
+          <a href="/income-tax-dashboard#bond-income" className={hashLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</a>
+          <a href="/income-tax-dashboard#dividend-income" className={hashLinkClass}><PieChart className="mr-3 h-4 w-4" />Dividend</a>
+        </div>
 
         <div className="space-y-1 pt-2">
-          <a href="/income-tax-dashboard#salary-income" className={hashLinkClass}>
-            <Wallet className="mr-3 h-4 w-4" />
-            Salary
-          </a>
-          <a href="/income-tax-dashboard#rental-income" className={hashLinkClass}>
-            <Home className="mr-3 h-4 w-4" />
-            Rental
-          </a>
-          <a href="/income-tax-dashboard#fd-income" className={hashLinkClass}>
-            <Landmark className="mr-3 h-4 w-4" />
-            FD
-          </a>
-          <a href="/income-tax-dashboard#bond-income" className={hashLinkClass}>
-            <FileText className="mr-3 h-4 w-4" />
-            Bond
-          </a>
-          <a href="/income-tax-dashboard#dividend-income" className={hashLinkClass}>
-            <PieChart className="mr-3 h-4 w-4" />
-            Dividend
-          </a>
-          <NavLink to="/capital-gains" className={subNavLinkClass}>
+          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Capital Gains</p>
+          <NavLink to="/capital-gains" className={subNavLinkClass} end>
             <TrendingUp className="mr-3 h-4 w-4" />
-            Capital Gains
+            Summary
+          </NavLink>
+          <NavLink to="/demat-gains" className={subNavLinkClass}>
+            <Building className="mr-3 h-4 w-4" />
+            Demat Accounts
+          </NavLink>
+          <NavLink to="/mutual-fund-gains" className={subNavLinkClass}>
+            <AreaChart className="mr-3 h-4 w-4" />
+            Mutual Funds
           </NavLink>
         </div>
       </nav>
