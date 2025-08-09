@@ -10,16 +10,16 @@ import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 
-interface Bond {
-  name: string;
-  isin: string;
-  income: number | string;
+interface FD {
+  bankName: string;
+  accountNo: string;
+  interest: number | string;
 }
 
-const LOCAL_STORAGE_KEY = "dyad-bonds-income";
+const LOCAL_STORAGE_KEY = "dyad-fd-income";
 
-const BondsPage: React.FC = () => {
-  const [bonds, setBonds] = useState<Bond[]>(() => {
+const FDIncomePage: React.FC = () => {
+  const [fds, setFds] = useState<FD[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
@@ -27,41 +27,41 @@ const BondsPage: React.FC = () => {
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (error) {
-      showError("Could not load saved bond data.");
+      showError("Could not load saved FD data.");
     }
-    return Array(5).fill({ name: "", isin: "", income: "" });
+    return Array(5).fill({ bankName: "", accountNo: "", interest: "" });
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(bonds));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fds));
     window.dispatchEvent(new Event('storage')); // Notify dashboard
-  }, [bonds]);
+  }, [fds]);
 
-  const handleInputChange = (index: number, field: keyof Bond, value: string) => {
-    const newBonds = [...bonds];
-    newBonds[index] = { ...newBonds[index], [field]: value };
-    setBonds(newBonds);
+  const handleInputChange = (index: number, field: keyof FD, value: string) => {
+    const newFds = [...fds];
+    newFds[index] = { ...newFds[index], [field]: value };
+    setFds(newFds);
   };
 
   const addRow = () => {
-    setBonds([...bonds, { name: "", isin: "", income: "" }]);
+    setFds([...fds, { bankName: "", accountNo: "", interest: "" }]);
   };
 
-  const totalIncome = bonds.reduce((total, bond) => total + (Number(bond.income) || 0), 0);
+  const totalInterest = fds.reduce((total, fd) => total + (Number(fd.interest) || 0), 0);
 
   const handleExport = () => {
-    const dataStr = JSON.stringify({ bonds }, null, 2);
+    const dataStr = JSON.stringify({ fds }, null, 2);
     const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-    const exportFileDefaultName = "bonds-income.json";
+    const exportFileDefaultName = "fd-income.json";
     const linkElement = document.createElement("a");
     linkElement.setAttribute("href", dataUri);
     linkElement.setAttribute("download", exportFileDefaultName);
     document.body.appendChild(linkElement);
     linkElement.click();
     document.body.removeChild(linkElement);
-    showSuccess("Bond data exported successfully!");
+    showSuccess("FD data exported successfully!");
   };
 
   const handleImportClick = () => {
@@ -75,27 +75,22 @@ const BondsPage: React.FC = () => {
     const processData = (data: any[]) => {
       const parsedData = data
         .map((row: any) => ({
-          name: String(row.name || row.Name || row['Bond Name'] || ''),
-          isin: String(row.isin || row.ISIN || ''),
-          income: row.income || row.Income || 0,
+          bankName: String(row.bankName || row['Bank Name'] || ''),
+          accountNo: String(row.accountNo || row['Account No'] || row['Account/Receipt No.'] || ''),
+          interest: row.interest || row.Interest || row['Interest Income'] || 0,
         }))
-        .filter(item => item.name && item.isin && !isNaN(parseFloat(String(item.income))));
+        .filter(item => item.bankName && !isNaN(parseFloat(String(item.interest))));
       
       if (parsedData.length > 0) {
-        setBonds(parsedData);
-        showSuccess("Bond data imported successfully!");
+        setFds(parsedData);
+        showSuccess("FD data imported successfully!");
       } else {
-        showError("No valid bond data found. Please check column names (e.g., name, isin, income).");
+        showError("No valid FD data found. Please check column names (e.g., bankName, accountNo, interest).");
       }
     };
 
     if (file.name.endsWith(".csv")) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => processData(result.data),
-        error: () => showError("Failed to parse CSV."),
-      });
+      Papa.parse(file, { header: true, skipEmptyLines: true, complete: (result) => processData(result.data), error: () => showError("Failed to parse CSV.") });
     } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -126,7 +121,7 @@ const BondsPage: React.FC = () => {
         </Link>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
-            Bond Income
+            FD Interest Income
           </h1>
           <div className="flex items-center gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv, .xlsx, .xls" className="hidden" />
@@ -138,13 +133,13 @@ const BondsPage: React.FC = () => {
         <Card className="mb-8">
           <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-xl font-semibold">Total Bond Income: ₹{totalIncome.toLocaleString("en-IN")}</p>
+            <p className="text-xl font-semibold">Total FD Interest Income: ₹{totalInterest.toLocaleString("en-IN")}</p>
           </CardContent>
         </Card>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Bond Income Details</CardTitle>
+            <CardTitle>FD Details</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -152,39 +147,23 @@ const BondsPage: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">S.No</TableHead>
-                    <TableHead>Bond Name</TableHead>
-                    <TableHead>ISIN</TableHead>
-                    <TableHead className="text-right">Income</TableHead>
+                    <TableHead>Bank Name</TableHead>
+                    <TableHead>Account/Receipt No.</TableHead>
+                    <TableHead className="text-right">Interest Income</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bonds.map((bond, index) => (
+                  {fds.map((fd, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        <Input
-                          value={bond.name}
-                          onChange={(e) => handleInputChange(index, "name", e.target.value)}
-                          placeholder="e.g. NHAI 5.5% 2030"
-                          className="min-w-[200px]"
-                        />
+                        <Input value={fd.bankName} onChange={(e) => handleInputChange(index, "bankName", e.target.value)} placeholder="e.g. HDFC Bank" className="min-w-[200px]" />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          value={bond.isin}
-                          onChange={(e) => handleInputChange(index, "isin", e.target.value)}
-                          placeholder="e.g. INE906B07CB9"
-                          className="min-w-[150px]"
-                        />
+                        <Input value={fd.accountNo} onChange={(e) => handleInputChange(index, "accountNo", e.target.value)} placeholder="Enter account or receipt no." className="min-w-[150px]" />
                       </TableCell>
                       <TableCell className="text-right">
-                        <Input
-                          type="number"
-                          value={bond.income}
-                          onChange={(e) => handleInputChange(index, "income", e.target.value)}
-                          placeholder="Enter income"
-                          className="text-right min-w-[120px]"
-                        />
+                        <Input type="number" value={fd.interest} onChange={(e) => handleInputChange(index, "interest", e.target.value)} placeholder="Enter interest" className="text-right min-w-[120px]" />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -202,4 +181,4 @@ const BondsPage: React.FC = () => {
   );
 };
 
-export default BondsPage;
+export default FDIncomePage;

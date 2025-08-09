@@ -8,17 +8,19 @@ import { ArrowRight } from "lucide-react";
 
 const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-broker2-dividends"];
 const bondIncomeSource = "dyad-bonds-income";
+const fdIncomeSource = "dyad-fd-income";
 
 const IncomeTaxDashboard: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
   const [rentalIncome, setRentalIncome] = useState<number | string>("");
-  const [fdIncome, setFdIncome] = useState<number | string>("");
+  const [totalFdIncome, setTotalFdIncome] = useState(0);
   const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
 
   useEffect(() => {
     const calculateTotals = () => {
+      // Dividend Income
       let dividendTotal = 0;
       dividendSources.forEach(key => {
         try {
@@ -29,6 +31,7 @@ const IncomeTaxDashboard: React.FC = () => {
       });
       setTotalDividendIncome(dividendTotal);
 
+      // Bond Income
       let bondTotal = 0;
       try {
         const savedBondData = localStorage.getItem(bondIncomeSource);
@@ -36,6 +39,15 @@ const IncomeTaxDashboard: React.FC = () => {
         bondTotal = items.reduce((sum, item) => sum + (Number(item.income) || 0), 0);
       } catch {}
       setTotalBondIncome(bondTotal);
+
+      // FD Income
+      let fdTotal = 0;
+      try {
+        const savedFdData = localStorage.getItem(fdIncomeSource);
+        const items: { interest: number }[] = savedFdData ? JSON.parse(savedFdData) : [];
+        fdTotal = items.reduce((sum, item) => sum + (Number(item.interest) || 0), 0);
+      } catch {}
+      setTotalFdIncome(fdTotal);
     };
 
     calculateTotals();
@@ -53,7 +65,7 @@ const IncomeTaxDashboard: React.FC = () => {
   const totalIncome =
     (Number(salaryIncome) || 0) +
     (Number(rentalIncome) || 0) +
-    (Number(fdIncome) || 0) +
+    totalFdIncome +
     (Number(speculativeIncome) || 0) +
     totalDividendIncome +
     totalBondIncome;
@@ -79,9 +91,12 @@ const IncomeTaxDashboard: React.FC = () => {
             </CardContent>
           </Card>
           <Card id="fd-income">
-            <CardHeader><CardTitle>FD Income</CardTitle></CardHeader>
+            <CardHeader><CardTitle>FD Interest Income</CardTitle></CardHeader>
             <CardContent>
-              <IncomeField label="Interest from Fixed Deposits" id="fdIncome" value={fdIncome} onChange={(e) => setFdIncome(e.target.value)} placeholder="Enter FD interest" />
+              <p className="text-2xl font-bold mb-4">₹{totalFdIncome.toLocaleString("en-IN")}</p>
+              <Link to="/fd-income">
+                <Button variant="outline">Manage FDs <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
             </CardContent>
           </Card>
           <Card id="bond-income">

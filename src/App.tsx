@@ -13,6 +13,7 @@ import MutualFundGainsPage from "./pages/MutualFundGainsPage";
 import DividendsPage from "./pages/DividendsPage";
 import DividendManagementPage from "./pages/DividendManagementPage";
 import BondsPage from "./pages/BondsPage";
+import FDIncomePage from "./pages/FDIncomePage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,10 @@ const App = () => (
             <Route
               path="/bonds"
               element={<BondsPage />}
+            />
+            <Route
+              path="/fd-income"
+              element={<FDIncomePage />}
             />
           </Route>
 
