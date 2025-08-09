@@ -7,36 +7,46 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ArrowRight } from "lucide-react";
 
 const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-broker2-dividends"];
+const bondIncomeSource = "dyad-bonds-income";
 
 const IncomeTaxDashboard: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
   const [rentalIncome, setRentalIncome] = useState<number | string>("");
   const [fdIncome, setFdIncome] = useState<number | string>("");
-  const [bondIncome, setBondIncome] = useState<number | string>("");
   const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
+  const [totalBondIncome, setTotalBondIncome] = useState(0);
 
   useEffect(() => {
-    const calculateTotalDividends = () => {
-      let total = 0;
+    const calculateTotals = () => {
+      let dividendTotal = 0;
       dividendSources.forEach(key => {
         try {
           const savedData = localStorage.getItem(key);
           const items: { amount: number }[] = savedData ? JSON.parse(savedData) : [];
-          total += items.reduce((sum, item) => sum + (item.amount || 0), 0);
+          dividendTotal += items.reduce((sum, item) => sum + (item.amount || 0), 0);
         } catch {}
       });
-      setTotalDividendIncome(total);
+      setTotalDividendIncome(dividendTotal);
+
+      let bondTotal = 0;
+      try {
+        const savedBondData = localStorage.getItem(bondIncomeSource);
+        const items: { income: number }[] = savedBondData ? JSON.parse(savedBondData) : [];
+        bondTotal = items.reduce((sum, item) => sum + (Number(item.income) || 0), 0);
+      } catch {}
+      setTotalBondIncome(bondTotal);
     };
 
-    calculateTotalDividends();
+    calculateTotals();
 
-    window.addEventListener("storage", calculateTotalDividends);
-    window.addEventListener("focus", calculateTotalDividends);
+    const handleStorageChange = () => calculateTotals();
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("focus", handleStorageChange);
 
     return () => {
-      window.removeEventListener("storage", calculateTotalDividends);
-      window.removeEventListener("focus", calculateTotalDividends);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", handleStorageChange);
     };
   }, []);
 
@@ -44,9 +54,9 @@ const IncomeTaxDashboard: React.FC = () => {
     (Number(salaryIncome) || 0) +
     (Number(rentalIncome) || 0) +
     (Number(fdIncome) || 0) +
-    (Number(bondIncome) || 0) +
     (Number(speculativeIncome) || 0) +
-    totalDividendIncome;
+    totalDividendIncome +
+    totalBondIncome;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -77,7 +87,10 @@ const IncomeTaxDashboard: React.FC = () => {
           <Card id="bond-income">
             <CardHeader><CardTitle>Bond Income</CardTitle></CardHeader>
             <CardContent>
-              <IncomeField label="Interest from Bonds" id="bondIncome" value={bondIncome} onChange={(e) => setBondIncome(e.target.value)} placeholder="Enter bond interest" />
+              <p className="text-2xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
+              <Link to="/bonds">
+                <Button variant="outline">Manage Bonds <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
             </CardContent>
           </Card>
           <Card>

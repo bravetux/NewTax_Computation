@@ -22,11 +22,6 @@ const Sidebar = () => {
   const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(true);
   const [isDividendsOpen, setIsDividendsOpen] = useState(true);
 
-  const isCapitalGainsActive = 
-    location.pathname.startsWith('/capital-gains') ||
-    location.pathname.startsWith('/demat-gains') ||
-    location.pathname.startsWith('/mutual-fund-gains');
-
   const mainNavLinkClass = (isActive: boolean) =>
     cn(
       "flex items-center px-3 py-2 text-sm font-medium rounded-md",
@@ -45,6 +40,15 @@ const Sidebar = () => {
     );
 
   const hashLinkClass = "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700";
+  
+  const incomeNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md",
+      isActive
+        ? "text-primary dark:text-primary-foreground font-semibold"
+        : "text-gray-600 dark:text-gray-400",
+      "hover:bg-gray-200 dark:hover:bg-gray-700"
+    );
 
   return (
     <div className="flex flex-col h-full bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
@@ -66,7 +70,7 @@ const Sidebar = () => {
           <a href="/income-tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
           <a href="/income-tax-dashboard#rental-income" className={hashLinkClass}><Home className="mr-3 h-4 w-4" />Rental</a>
           <a href="/income-tax-dashboard#fd-income" className={hashLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</a>
-          <a href="/income-tax-dashboard#bond-income" className={hashLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</a>
+          <NavLink to="/bonds" className={incomeNavLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</NavLink>
         </div>
 
         <Collapsible open={isCapitalGainsOpen} onOpenChange={setIsCapitalGainsOpen} className="space-y-1 pt-2">
