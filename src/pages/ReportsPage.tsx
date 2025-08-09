@@ -2,8 +2,19 @@ import React, { useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, Trash2 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Define all the local storage keys in one place
 const LOCAL_STORAGE_KEYS = {
@@ -74,7 +85,6 @@ const ReportsPage: React.FC = () => {
         
         const importedData = JSON.parse(text);
 
-        // Basic validation
         const requiredKeys = ["dematAccounts", "mutualFunds", "dividends", "bonds", "fds", "properties", "salaryIncome"];
         const hasAllKeys = requiredKeys.every(key => key in importedData);
         const hasDividendKeys = importedData.dividends && "pms" in importedData.dividends && "broker1" in importedData.dividends && "broker2" in importedData.dividends;
@@ -84,7 +94,6 @@ const ReportsPage: React.FC = () => {
           return;
         }
 
-        // Set data to localStorage
         localStorage.setItem(LOCAL_STORAGE_KEYS.dematGains, JSON.stringify(importedData.dematAccounts || []));
         localStorage.setItem(LOCAL_STORAGE_KEYS.mutualFundGains, JSON.stringify(importedData.mutualFunds || []));
         localStorage.setItem(LOCAL_STORAGE_KEYS.pmsDividends, JSON.stringify(importedData.dividends.pms || []));
@@ -95,7 +104,6 @@ const ReportsPage: React.FC = () => {
         localStorage.setItem(LOCAL_STORAGE_KEYS.rentalIncome, JSON.stringify(importedData.properties || []));
         localStorage.setItem(LOCAL_STORAGE_KEYS.salaryIncome, JSON.stringify(importedData.salaryIncome || ""));
 
-        // Notify other components to update their state
         window.dispatchEvent(new Event('storage'));
 
         showSuccess("All data imported successfully! The app will now reflect the new data.");
@@ -104,13 +112,25 @@ const ReportsPage: React.FC = () => {
         console.error("Import failed:", error);
         showError("Failed to parse file. Please ensure it's a valid JSON backup file.");
       } finally {
-        // Reset file input to allow importing the same file again
         if (event.target) {
           event.target.value = "";
         }
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleClearAllData = () => {
+    try {
+      Object.values(LOCAL_STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+      window.dispatchEvent(new Event('storage'));
+      showSuccess("All application data has been cleared.");
+    } catch (error) {
+      console.error("Failed to clear data:", error);
+      showError("An error occurred while clearing data.");
+    }
   };
 
   return (
@@ -128,7 +148,7 @@ const ReportsPage: React.FC = () => {
               You can export all your entered data into a single JSON file as a backup.
               This file can be imported later to restore your data on this or another device.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -142,6 +162,28 @@ const ReportsPage: React.FC = () => {
               <Button variant="default" onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" /> Export Data
               </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash2 className="mr-2 h-4 w-4" /> Clear All Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete all
+                      your saved income, capital gains, and dividend data from this browser.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearAllData}>
+                      Yes, delete everything
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
