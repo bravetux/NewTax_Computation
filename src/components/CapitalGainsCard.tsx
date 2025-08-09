@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import IncomeField from "./IncomeField";
 
 interface CapitalGainsCardProps {
@@ -8,6 +9,8 @@ interface CapitalGainsCardProps {
   ltcg: number | string;
   onStcgChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLtcgChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isEditing: boolean;
+  onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const CapitalGainsCard: React.FC<CapitalGainsCardProps> = ({
@@ -16,11 +19,22 @@ const CapitalGainsCard: React.FC<CapitalGainsCardProps> = ({
   ltcg,
   onStcgChange,
   onLtcgChange,
+  isEditing,
+  onTitleChange,
 }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        {isEditing ? (
+          <Input
+            value={title}
+            onChange={onTitleChange}
+            placeholder="Enter Account Name"
+            className="text-lg font-semibold"
+          />
+        ) : (
+          <CardTitle>{title}</CardTitle>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <IncomeField

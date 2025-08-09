@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import IncomeTaxDashboard from "./pages/IncomeTaxDashboard";
+import CapitalGainsPage from "./pages/CapitalGainsPage";
 import Layout from "./components/Layout";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,10 @@ const App = () => (
             <Route
               path="/income-tax-dashboard"
               element={<IncomeTaxDashboard />}
+            />
+            <Route
+              path="/capital-gains"
+              element={<CapitalGainsPage />}
             />
           </Route>
 

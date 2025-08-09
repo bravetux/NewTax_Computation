@@ -18,8 +18,17 @@ const Sidebar = () => {
         ? "bg-primary text-primary-foreground"
         : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
     );
+  
+  const subNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md",
+      isActive
+        ? "text-primary dark:text-primary-foreground"
+        : "text-gray-600 dark:text-gray-400",
+      "hover:bg-gray-200 dark:hover:bg-gray-700"
+    );
 
-  const subNavLinkClass = "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700";
+  const hashLinkClass = "flex items-center pl-8 pr-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700";
 
   return (
     <div className="flex flex-col h-full bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
@@ -37,27 +46,27 @@ const Sidebar = () => {
         </NavLink>
 
         <div className="space-y-1 pt-2">
-          <NavLink to="/income-tax-dashboard#salary-income" className={subNavLinkClass}>
+          <a href="/income-tax-dashboard#salary-income" className={hashLinkClass}>
             <Wallet className="mr-3 h-4 w-4" />
             Salary
-          </NavLink>
-          <NavLink to="/income-tax-dashboard#rental-income" className={subNavLinkClass}>
+          </a>
+          <a href="/income-tax-dashboard#rental-income" className={hashLinkClass}>
             <Home className="mr-3 h-4 w-4" />
             Rental
-          </NavLink>
-          <NavLink to="/income-tax-dashboard#fd-income" className={subNavLinkClass}>
+          </a>
+          <a href="/income-tax-dashboard#fd-income" className={hashLinkClass}>
             <Landmark className="mr-3 h-4 w-4" />
             FD
-          </NavLink>
-          <NavLink to="/income-tax-dashboard#bond-income" className={subNavLinkClass}>
+          </a>
+          <a href="/income-tax-dashboard#bond-income" className={hashLinkClass}>
             <FileText className="mr-3 h-4 w-4" />
             Bond
-          </NavLink>
-          <NavLink to="/income-tax-dashboard#dividend-income" className={subNavLinkClass}>
+          </a>
+          <a href="/income-tax-dashboard#dividend-income" className={hashLinkClass}>
             <PieChart className="mr-3 h-4 w-4" />
             Dividend
-          </NavLink>
-          <NavLink to="/income-tax-dashboard#capital-gains" className={subNavLinkClass}>
+          </a>
+          <NavLink to="/capital-gains" className={subNavLinkClass}>
             <TrendingUp className="mr-3 h-4 w-4" />
             Capital Gains
           </NavLink>

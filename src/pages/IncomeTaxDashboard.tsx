@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import IncomeField from "@/components/IncomeField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import CapitalGainsCard from "@/components/CapitalGainsCard";
-
-interface DematAccount {
-  stcg: number | string;
-  ltcg: number | string;
-}
 
 const IncomeTaxDashboard: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
@@ -17,32 +11,13 @@ const IncomeTaxDashboard: React.FC = () => {
   const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [dividendIncome, setDividendIncome] = useState<number | string>("");
 
-  const [dematAccounts, setDematAccounts] = useState<DematAccount[]>(
-    Array(5).fill({ stcg: "", ltcg: "" })
-  );
-
-  const handleDematChange = (
-    index: number,
-    field: "stcg" | "ltcg",
-    value: string
-  ) => {
-    const newAccounts = [...dematAccounts];
-    newAccounts[index] = { ...newAccounts[index], [field]: value };
-    setDematAccounts(newAccounts);
-  };
-
-  const totalDematGains = dematAccounts.reduce((total, account) => {
-    return total + (Number(account.stcg) || 0) + (Number(account.ltcg) || 0);
-  }, 0);
-
   const totalIncome =
     (Number(salaryIncome) || 0) +
     (Number(rentalIncome) || 0) +
     (Number(fdIncome) || 0) +
     (Number(bondIncome) || 0) +
     (Number(speculativeIncome) || 0) +
-    (Number(dividendIncome) || 0) +
-    totalDematGains;
+    (Number(dividendIncome) || 0);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -90,34 +65,16 @@ const IncomeTaxDashboard: React.FC = () => {
           </Card>
         </div>
 
-        <div id="capital-gains" className="mt-8">
-          <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-gray-50">
-            Capital Gains from Demat Accounts
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dematAccounts.map((account, index) => (
-              <CapitalGainsCard
-                key={index}
-                title={`Demat Account ${index + 1}`}
-                stcg={account.stcg}
-                ltcg={account.ltcg}
-                onStcgChange={(e) => handleDematChange(index, "stcg", e.target.value)}
-                onLtcgChange={(e) => handleDematChange(index, "ltcg", e.target.value)}
-              />
-            ))}
-          </div>
-        </div>
-
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Income Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg">
-              Total Income (so far): ₹{totalIncome.toLocaleString("en-IN")}
+              Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              (More income types and detailed calculations will be added here.)
+              (Capital gains are managed on their dedicated page.)
             </p>
           </CardContent>
         </Card>
