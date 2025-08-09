@@ -28,6 +28,8 @@ const IncomePage: React.FC = () => {
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
   const [totalCapitalGainsTax, setTotalCapitalGainsTax] = useState(0);
+  const [totalStcg, setTotalStcg] = useState(0);
+  const [totalLtcg, setTotalLtcg] = useState(0);
 
   useEffect(() => {
     const calculateTotals = () => {
@@ -97,6 +99,8 @@ const IncomePage: React.FC = () => {
 
       const totalStcg = dematTotals.stcg + mfTotals.stcg;
       const totalLtcg = dematTotals.ltcg + mfTotals.ltcg;
+      setTotalStcg(totalStcg);
+      setTotalLtcg(totalLtcg);
 
       const ltcgExemption = 150000;
       const taxableLtcg = Math.max(0, totalLtcg - ltcgExemption);
@@ -196,12 +200,26 @@ const IncomePage: React.FC = () => {
               </Link>
             </CardContent>
           </Card>
-          <Card id="capital-gains-tax">
-            <CardHeader><CardTitle>Capital Gains Tax</CardTitle></CardHeader>
+          <Card id="capital-gains-summary">
+            <CardHeader><CardTitle>Capital Gains</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalCapitalGainsTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span>Total STCG:</span>
+                  <span className="font-semibold">₹{totalStcg.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Total LTCG:</span>
+                  <span className="font-semibold">₹{totalLtcg.toLocaleString("en-IN")}</span>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between font-medium">
+                  <span>Tax Payable:</span>
+                  <span className="font-bold">₹{totalCapitalGainsTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              </div>
               <Link to="/capital-gains">
-                <Button variant="outline">View Details <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <Button variant="outline" className="w-full">View Details <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
             </CardContent>
           </Card>
