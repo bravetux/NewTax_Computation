@@ -17,7 +17,7 @@ import FDIncomePage from "./pages/FDIncomePage";
 import RentalIncomePage from "./pages/RentalIncomePage";
 import IncomeSummaryPage from "./pages/IncomeSummaryPage";
 import TaxComputationPage from "./pages/TaxComputationPage";
-import SalaryIncomePage from "./pages/SalaryIncomePage";
+import SalaryPage from "./pages/SalaryPage";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +45,7 @@ const App = () => (
             />
             <Route
               path="/salary-income"
-              element={<SalaryIncomePage />}
+              element={<SalaryPage />}
             />
             <Route
               path="/capital-gains"
