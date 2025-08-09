@@ -20,7 +20,8 @@ const PlanWithAiPage: React.FC = () => {
   const [apiKey, setApiKey] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
   const [selectedModel, setSelectedModel] = useState(AI_MODELS.openai[0]);
-  const [prompt, setPrompt] = useState("Based on my income and capital gains data in this application, suggest some tax-saving strategies.");
+  const [userPrompt, setUserPrompt] = useState("");
+  const [financialData, setFinancialData] = useState<string | null>(null);
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const configFileInputRef = useRef<HTMLInputElement>(null);
@@ -78,10 +79,8 @@ const PlanWithAiPage: React.FC = () => {
           showError("Could not read file content.");
           return;
         }
-        const userPrompt = prompt;
-        const newPrompt = `That you are expert Tax Planner, my income and tax details are follows ${reportJson}\n\n${userPrompt}`;
-        setPrompt(newPrompt);
-        showSuccess("Financial data loaded into prompt successfully!");
+        setFinancialData(reportJson);
+        showSuccess("Financial data loaded. It will be sent with your next prompt.");
       } catch (err) {
         showError("Failed to read report file.");
       }
@@ -111,6 +110,9 @@ const PlanWithAiPage: React.FC = () => {
     const toastId = showLoading("Simulating AI response...");
     setIsLoading(true);
     setResponse("");
+
+    const fullPrompt = `That you are expert Tax Planner, my income and tax details are follows ${financialData || 'No financial data was loaded.'}\n\n${userPrompt}`;
+    console.log("Full prompt for AI:", fullPrompt); // For debugging
 
     setTimeout(() => {
       dismissToast(toastId);
@@ -177,15 +179,15 @@ const PlanWithAiPage: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Your Prompt</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => saveToFile(prompt, "ai-prompt.txt", "Prompt saved!")}><Save className="mr-2 h-4 w-4" /> Save</Button>
+              <Button variant="outline" size="sm" onClick={() => saveToFile(userPrompt, "ai-prompt.txt", "Prompt saved!")}><Save className="mr-2 h-4 w-4" /> Save</Button>
             </CardHeader>
             <CardContent>
-              <Textarea placeholder="Enter your prompt here..." className="min-h-[120px]" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
+              <Textarea placeholder="Enter your prompt here... For example: 'Suggest some tax-saving strategies based on my data.'" className="min-h-[120px]" value={userPrompt} onChange={(e) => setUserPrompt(e.target.value)} />
             </CardContent>
           </Card>
 
           <div className="text-center">
-            <Button onClick={handleSubmit} disabled={isLoading}>
+            <Button onClick={handleSubmit} disabled={isLoading || !userPrompt}>
               {isLoading ? "Thinking..." : <><Bot className="mr-2 h-4 w-4" /> Get Advice</>}
             </Button>
           </div>
