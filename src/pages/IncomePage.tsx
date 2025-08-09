@@ -20,7 +20,7 @@ interface CapitalGainsItem {
   ltcg: number | string;
 }
 
-const IncomeSummaryPage: React.FC = () => {
+const IncomePage: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
   const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
@@ -134,7 +134,7 @@ const IncomeSummaryPage: React.FC = () => {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          Income Summary
+          Tax Dashboard
         </h1>
 
         <Card className="mb-8">
@@ -230,4 +230,4 @@ const IncomeSummaryPage: React.FC = () => {
   );
 };
 
-export default IncomeSummaryPage;
+export default IncomePage;

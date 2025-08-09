@@ -10,8 +10,8 @@ const Index = () => {
         <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
           Start building your amazing project here!
         </p>
-        <Link to="/income-summary">
-          <Button size="lg" className="text-lg px-8 py-4">Go to Income Summary</Button>
+        <Link to="/tax-dashboard">
+          <Button size="lg" className="text-lg px-8 py-4">Go to Tax Dashboard</Button>
         </Link>
       </div>
       <MadeWithDyad />

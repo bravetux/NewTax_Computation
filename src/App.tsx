@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import IncomeSummaryPage from "./pages/IncomeSummaryPage";
+import IncomePage from "./pages/IncomePage";
 import CapitalGainsPage from "./pages/CapitalGainsPage";
 import Layout from "./components/Layout";
 import DematGainsPage from "./pages/DematGainsPage";
@@ -29,8 +29,8 @@ const App = () => (
 
           <Route element={<Layout />}>
             <Route
-              path="/income-summary"
-              element={<IncomeSummaryPage />}
+              path="/tax-dashboard"
+              element={<IncomePage />}
             />
             <Route
               path="/capital-gains"
