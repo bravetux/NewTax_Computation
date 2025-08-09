@@ -130,8 +130,22 @@ const IncomePage: React.FC = () => {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          Income & Tax Summary
+          Tax Dashboard
         </h1>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Overall Income Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg">
+              Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              (Capital gains are managed and taxed separately.)
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card id="salary-income">
@@ -192,20 +206,6 @@ const IncomePage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Overall Income Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg">
-              Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              (Capital gains are managed and taxed separately.)
-            </p>
-          </CardContent>
-        </Card>
       </div>
       <MadeWithDyad />
     </div>

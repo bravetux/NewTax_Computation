@@ -29,7 +29,7 @@ const App = () => (
 
           <Route element={<Layout />}>
             <Route
-              path="/income-tax-dashboard"
+              path="/tax-dashboard"
               element={<IncomePage />}
             />
             <Route

@@ -115,9 +115,9 @@ const FDIncomePage: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
-        <Link to="/income-tax-dashboard" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:underline mb-4">
+        <Link to="/tax-dashboard" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:underline mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Income Summary
+          Back to Tax Dashboard
         </Link>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
