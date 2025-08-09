@@ -173,17 +173,10 @@ const DividendManagementPage: React.FC = () => {
         </div>
 
         <div className="space-y-8">
-          {source === 'broker1' || source === 'broker2' ? (
-            <>
-              {SummaryCard}
-              {DetailsCard}
-            </>
-          ) : (
-            <>
-              {DetailsCard}
-              {SummaryCard}
-            </>
-          )}
+          <>
+            {SummaryCard}
+            {DetailsCard}
+          </>
         </div>
       </div>
       <MadeWithDyad />
