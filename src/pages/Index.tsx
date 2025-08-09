@@ -8,7 +8,7 @@ const Index = () => {
       <div className="text-center p-4">
         <h1 className="text-4xl font-bold mb-4">Welcome to Bravetux Tax Planning App</h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
-          Your personal tax planning assistant.
+          Start using this wonderful Tax App
         </p>
         <Link to="/tax-dashboard">
           <Button size="lg" className="text-lg px-8 py-4">Go to Tax Dashboard</Button>
