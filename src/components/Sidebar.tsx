@@ -12,6 +12,7 @@ import {
   Briefcase,
   Library,
   ChevronDown,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -67,6 +68,7 @@ const Sidebar = () => {
         
         <div className="space-y-1 pt-2">
           <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Income</p>
+          <NavLink to="/income-summary" className={incomeNavLinkClass}><BarChart2 className="mr-3 h-4 w-4" />Summary</NavLink>
           <a href="/tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
           <NavLink to="/rental-income" className={incomeNavLinkClass}><Home className="mr-3 h-4 w-4" />Rental</NavLink>
           <NavLink to="/fd-income" className={incomeNavLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</NavLink>
