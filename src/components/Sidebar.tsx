@@ -62,7 +62,7 @@ const Sidebar = () => {
           end
         >
           <LayoutDashboard className="mr-3 h-5 w-5" />
-          Dashboard
+          Income Summary
         </NavLink>
         
         <div className="space-y-1 pt-2">

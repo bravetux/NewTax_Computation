@@ -11,13 +11,23 @@ const bondIncomeSource = "dyad-bonds-income";
 const fdIncomeSource = "dyad-fd-income";
 const rentalIncomeSource = "dyad-rental-income";
 
-const IncomeTaxDashboard: React.FC = () => {
+const DEMAT_KEY = "dyad-demat-gains";
+const MF_KEY = "dyad-mutual-fund-gains";
+
+interface CapitalGainsItem {
+  name: string;
+  stcg: number | string;
+  ltcg: number | string;
+}
+
+const IncomePage: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
   const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
   const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
+  const [totalCapitalGainsTax, setTotalCapitalGainsTax] = useState(0);
 
   useEffect(() => {
     const calculateTotals = () => {
@@ -68,6 +78,32 @@ const IncomeTaxDashboard: React.FC = () => {
 
       } catch {}
       setTotalRentalIncome(rentalTotal);
+
+      // Capital Gains Tax Calculation
+      const calculateGainsTotals = (key: string): { stcg: number; ltcg: number } => {
+        try {
+          const savedData = localStorage.getItem(key);
+          const items: CapitalGainsItem[] = savedData ? JSON.parse(savedData) : [];
+          const stcg = items.reduce((total, item) => total + (Number(item.stcg) || 0), 0);
+          const ltcg = items.reduce((total, item) => total + (Number(item.ltcg) || 0), 0);
+          return { stcg, ltcg };
+        } catch {
+          return { stcg: 0, ltcg: 0 };
+        }
+      };
+      
+      const dematTotals = calculateGainsTotals(DEMAT_KEY);
+      const mfTotals = calculateGainsTotals(MF_KEY);
+
+      const totalStcg = dematTotals.stcg + mfTotals.stcg;
+      const totalLtcg = dematTotals.ltcg + mfTotals.ltcg;
+
+      const ltcgExemption = 150000;
+      const taxableLtcg = Math.max(0, totalLtcg - ltcgExemption);
+      const ltcgTax = taxableLtcg * 0.125;
+      const stcgTax = totalStcg * 0.20;
+      const totalTax = ltcgTax + stcgTax;
+      setTotalCapitalGainsTax(totalTax);
     };
 
     calculateTotals();
@@ -94,7 +130,7 @@ const IncomeTaxDashboard: React.FC = () => {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          India Income Tax Planning Dashboard
+          Income & Tax Summary
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -146,18 +182,27 @@ const IncomeTaxDashboard: React.FC = () => {
               </Link>
             </CardContent>
           </Card>
+          <Card id="capital-gains-tax">
+            <CardHeader><CardTitle>Capital Gains Tax</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold mb-4">₹{totalCapitalGainsTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <Link to="/capital-gains">
+                <Button variant="outline">View Details <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Income Summary</CardTitle>
+            <CardTitle>Overall Income Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg">
               Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              (Capital gains are managed on their dedicated page.)
+              (Capital gains are managed and taxed separately.)
             </p>
           </CardContent>
         </Card>
@@ -167,4 +212,4 @@ const IncomeTaxDashboard: React.FC = () => {
   );
 };
 
-export default IncomeTaxDashboard;
+export default IncomePage;

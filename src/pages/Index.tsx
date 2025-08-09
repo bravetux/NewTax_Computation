@@ -11,7 +11,7 @@ const Index = () => {
           Start building your amazing project here!
         </p>
         <Link to="/income-tax-dashboard">
-          <Button size="lg" className="text-lg px-8 py-4">Go to Income Tax Dashboard</Button>
+          <Button size="lg" className="text-lg px-8 py-4">Go to Income Summary</Button>
         </Link>
       </div>
       <MadeWithDyad />
