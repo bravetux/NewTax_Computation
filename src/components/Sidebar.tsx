@@ -1,7 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Wallet,
   Home,
   Landmark,
   FileText,
@@ -14,6 +13,7 @@ import {
   ChevronDown,
   BarChart2,
   Calculator,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -131,6 +131,23 @@ const Sidebar = () => {
             </NavLink>
           </CollapsibleContent>
         </Collapsible>
+        
+        <div className="pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
+            <NavLink
+              to="/reports"
+              className={({isActive}) => mainNavLinkClass(isActive)}
+            >
+              <FileText className="mr-3 h-5 w-5" />
+              Reports
+            </NavLink>
+            <NavLink
+              to="/plan-with-ai"
+              className={({isActive}) => mainNavLinkClass(isActive)}
+            >
+              <Sparkles className="mr-3 h-5 w-5" />
+              Plan with AI
+            </NavLink>
+        </div>
       </nav>
     </div>
   );
