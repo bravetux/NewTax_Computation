@@ -10,7 +10,6 @@ interface Property {
   monthlyRent: number | string;
   monthsRented: number | string;
   propertyTax: number | string;
-  interestOnLoan: number | string;
 }
 
 const LOCAL_STORAGE_KEY = "dyad-rental-income";
@@ -26,7 +25,7 @@ const RentalIncomePage: React.FC = () => {
     } catch (error) {
       showError("Could not load saved rental data.");
     }
-    return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "", interestOnLoan: "" });
+    return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "" });
   });
 
   useEffect(() => {
@@ -45,20 +44,18 @@ const RentalIncomePage: React.FC = () => {
     const propertyTax = Number(property.propertyTax) || 0;
     const nav = gav - propertyTax;
     const standardDeduction = nav > 0 ? nav * 0.3 : 0;
-    const interestOnLoan = Number(property.interestOnLoan) || 0;
-    const taxableIncome = nav - standardDeduction - interestOnLoan;
-    return { gav, nav, standardDeduction, interestOnLoan, taxableIncome };
+    const taxableIncome = nav - standardDeduction;
+    return { gav, nav, standardDeduction, taxableIncome };
   };
 
   const totals = properties.reduce(
     (acc, prop) => {
-      const { gav, nav, standardDeduction, interestOnLoan, taxableIncome } = calculatePropertyIncome(prop);
+      const { gav, nav, standardDeduction, taxableIncome } = calculatePropertyIncome(prop);
       const propertyTax = Number(prop.propertyTax) || 0;
       acc.totalGrossRentalIncome += gav;
       acc.totalPropertyTax += propertyTax;
       acc.totalNetAnnualValue += nav;
       acc.totalStandardDeduction += standardDeduction;
-      acc.totalInterestOnLoan += interestOnLoan;
       acc.totalNetIncome += taxableIncome;
       return acc;
     },
@@ -67,7 +64,6 @@ const RentalIncomePage: React.FC = () => {
       totalPropertyTax: 0,
       totalNetAnnualValue: 0,
       totalStandardDeduction: 0,
-      totalInterestOnLoan: 0,
       totalNetIncome: 0,
     }
   );
@@ -97,7 +93,6 @@ const RentalIncomePage: React.FC = () => {
                   <IncomeField label="Monthly Rent" id={`monthly-rent-${index}`} value={property.monthlyRent} onChange={(e) => handleInputChange(index, "monthlyRent", e.target.value)} placeholder="e.g. 10000" />
                   <IncomeField label="No. of Months Rented" id={`months-rented-${index}`} value={property.monthsRented} onChange={(e) => handleInputChange(index, "monthsRented", e.target.value)} placeholder="e.g. 10" max="12" />
                   <IncomeField label="Property Tax Paid" id={`property-tax-${index}`} value={property.propertyTax} onChange={(e) => handleInputChange(index, "propertyTax", e.target.value)} placeholder="e.g. 5000" />
-                  <IncomeField label="Interest on Housing Loan" id={`interest-loan-${index}`} value={property.interestOnLoan} onChange={(e) => handleInputChange(index, "interestOnLoan", e.target.value)} placeholder="e.g. 0" />
                   
                   <div className="pt-2 space-y-1 text-sm">
                     <div className="flex justify-between"><span>Gross Annual Value (GAV):</span> <span>₹{gav.toLocaleString("en-IN")}</span></div>
@@ -120,7 +115,6 @@ const RentalIncomePage: React.FC = () => {
             <hr className="my-1 border-gray-200 dark:border-gray-700" />
             <div className="flex justify-between"><span>Total Net Annual Value:</span> <span className="font-semibold">₹{totals.totalNetAnnualValue.toLocaleString("en-IN")}</span></div>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Less: Total 30% Standard Deduction:</span> <span className="font-semibold">₹{totals.totalStandardDeduction.toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Less: Total Interest on Housing Loan:</span> <span className="font-semibold">₹{totals.totalInterestOnLoan.toLocaleString("en-IN")}</span></div>
             <hr className="my-1 border-gray-200 dark:border-gray-700" />
             <div className="flex justify-between text-lg"><p className="font-bold">Total Net Income from House Property:</p><p className="font-bold">₹{totals.totalNetIncome.toLocaleString("en-IN")}</p></div>
           </CardContent>

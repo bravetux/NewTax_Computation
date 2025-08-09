@@ -54,15 +54,14 @@ const IncomeTaxDashboard: React.FC = () => {
       let rentalTotal = 0;
       try {
         const savedRentalData = localStorage.getItem(rentalIncomeSource);
-        const properties: { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; interestOnLoan: number | string; }[] = savedRentalData ? JSON.parse(savedRentalData) : [];
+        const properties: { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; }[] = savedRentalData ? JSON.parse(savedRentalData) : [];
         
         const totalNetIncome = properties.reduce((total, prop) => {
             const gav = (Number(prop.monthlyRent) || 0) * (Number(prop.monthsRented) || 0);
             const propertyTax = Number(prop.propertyTax) || 0;
             const nav = gav - propertyTax;
             const standardDeduction = nav > 0 ? nav * 0.3 : 0;
-            const interestOnLoan = Number(prop.interestOnLoan) || 0;
-            const taxableIncome = nav - standardDeduction - interestOnLoan;
+            const taxableIncome = nav - standardDeduction;
             return total + taxableIncome;
         }, 0);
         rentalTotal = totalNetIncome;
@@ -112,7 +111,7 @@ const IncomeTaxDashboard: React.FC = () => {
               <Link to="/rental-income">
                 <Button variant="outline">Manage Properties <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
-            </CardContent>
+            </IframeContent>
           </Card>
           <Card id="fd-income">
             <CardHeader><CardTitle>FD Interest Income</CardTitle></CardHeader>
