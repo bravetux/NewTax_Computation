@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import IncomeField from "@/components/IncomeField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
@@ -13,25 +12,20 @@ const salaryIncomeSource = "dyad-salary-income";
 const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-broker2-dividends"];
 
 const IncomeSummaryPage: React.FC = () => {
-  const [salaryIncome, setSalaryIncome] = useState<number | string>(() => {
-    try {
-      const saved = localStorage.getItem(salaryIncomeSource);
-      return saved ? JSON.parse(saved) : "";
-    } catch {
-      return "";
-    }
-  });
+  const [salaryIncome, setSalaryIncome] = useState(0);
   const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem(salaryIncomeSource, JSON.stringify(salaryIncome));
-  }, [salaryIncome]);
-
-  useEffect(() => {
     const calculateTotals = () => {
+      // Salary Income
+      try {
+        const savedSalary = localStorage.getItem(salaryIncomeSource);
+        setSalaryIncome(Number(savedSalary ? JSON.parse(savedSalary) : 0));
+      } catch {}
+
       // Bond Income
       let bondTotal = 0;
       try {
@@ -119,10 +113,13 @@ const IncomeSummaryPage: React.FC = () => {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card id="salary-income">
+          <Card>
             <CardHeader><CardTitle>Salary Income</CardTitle></CardHeader>
             <CardContent>
-              <IncomeField label="Gross Salary" id="salaryIncome" value={salaryIncome} onChange={(e) => setSalaryIncome(e.target.value)} placeholder="Enter salary income" />
+              <p className="text-2xl font-bold mb-4">₹{salaryIncome.toLocaleString("en-IN")}</p>
+              <Link to="/salary-income">
+                <Button variant="outline">Manage Salary <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
             </CardContent>
           </Card>
           <Card>
