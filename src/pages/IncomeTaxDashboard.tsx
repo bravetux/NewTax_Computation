@@ -52,26 +52,25 @@ const IncomeTaxDashboard: React.FC = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {/* Existing Income Cards */}
-          <Card>
+          <Card id="salary-income">
             <CardHeader><CardTitle>Salary Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Gross Salary" id="salaryIncome" value={salaryIncome} onChange={(e) => setSalaryIncome(e.target.value)} placeholder="Enter salary income" />
             </CardContent>
           </Card>
-          <Card>
+          <Card id="rental-income">
             <CardHeader><CardTitle>Rental Property Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Annual Rent Received" id="rentalIncome" value={rentalIncome} onChange={(e) => setRentalIncome(e.target.value)} placeholder="Enter rental income" />
             </CardContent>
           </Card>
-          <Card>
+          <Card id="fd-income">
             <CardHeader><CardTitle>FD Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Interest from Fixed Deposits" id="fdIncome" value={fdIncome} onChange={(e) => setFdIncome(e.target.value)} placeholder="Enter FD interest" />
             </CardContent>
           </Card>
-          <Card>
+          <Card id="bond-income">
             <CardHeader><CardTitle>Bond Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Interest from Bonds" id="bondIncome" value={bondIncome} onChange={(e) => setBondIncome(e.target.value)} placeholder="Enter bond interest" />
@@ -83,7 +82,7 @@ const IncomeTaxDashboard: React.FC = () => {
               <IncomeField label="Profit from Speculation" id="speculativeIncome" value={speculativeIncome} onChange={(e) => setSpeculativeIncome(e.target.value)} placeholder="Enter speculative income" />
             </CardContent>
           </Card>
-          <Card>
+          <Card id="dividend-income">
             <CardHeader><CardTitle>Dividend Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Dividends Received" id="dividendIncome" value={dividendIncome} onChange={(e) => setDividendIncome(e.target.value)} placeholder="Enter dividend income" />
@@ -91,7 +90,7 @@ const IncomeTaxDashboard: React.FC = () => {
           </Card>
         </div>
 
-        <div className="mt-8">
+        <div id="capital-gains" className="mt-8">
           <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-gray-50">
             Capital Gains from Demat Accounts
           </h2>
