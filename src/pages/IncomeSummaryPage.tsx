@@ -112,7 +112,7 @@ const IncomeSummaryPage: React.FC = () => {
             <CardTitle>Gross Income Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
+            <p className="text-xl font-bold">
               Total Gross Income: ₹{grossIncome.toLocaleString("en-IN")}
             </p>
           </CardContent>
@@ -128,7 +128,7 @@ const IncomeSummaryPage: React.FC = () => {
           <Card>
             <CardHeader><CardTitle>Rental Property Income</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalRentalIncome.toLocaleString("en-IN")}</p>
+              <p className="text-xl font-bold mb-4">₹{totalRentalIncome.toLocaleString("en-IN")}</p>
               <Link to="/rental-income">
                 <Button variant="outline">Manage Properties <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
@@ -137,7 +137,7 @@ const IncomeSummaryPage: React.FC = () => {
           <Card>
             <CardHeader><CardTitle>FD Interest Income</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalFdIncome.toLocaleString("en-IN")}</p>
+              <p className="text-xl font-bold mb-4">₹{totalFdIncome.toLocaleString("en-IN")}</p>
               <Link to="/fd-income">
                 <Button variant="outline">Manage FDs <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
@@ -146,7 +146,7 @@ const IncomeSummaryPage: React.FC = () => {
           <Card>
             <CardHeader><CardTitle>Bonds Interest Income</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
+              <p className="text-xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
               <Link to="/bonds">
                 <Button variant="outline">Manage Bonds <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
@@ -155,7 +155,7 @@ const IncomeSummaryPage: React.FC = () => {
           <Card>
             <CardHeader><CardTitle>Dividend Income</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalDividendIncome.toLocaleString("en-IN")}</p>
+              <p className="text-xl font-bold mb-4">₹{totalDividendIncome.toLocaleString("en-IN")}</p>
               <Link to="/dividends">
                 <Button variant="outline">Manage Dividends <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
