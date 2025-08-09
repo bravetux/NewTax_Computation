@@ -79,7 +79,8 @@ const TaxComputationPage: React.FC = () => {
   const standardDeduction = income.salary > 0 ? 50000 : 0;
   const netTaxableIncome = Math.max(0, grossTotalIncome - standardDeduction);
 
-  const hasRebate = netTaxableIncome <= 1200000;
+  const rebateIncomeLimit = 1000000; // Income limit for zero tax, corresponding to a max rebate of ~₹60,000
+  const hasRebate = netTaxableIncome <= rebateIncomeLimit;
 
   const calculateSlabTax = (inc: number) => {
     if (inc <= 300000) return 0;
@@ -98,11 +99,11 @@ const TaxComputationPage: React.FC = () => {
   const cess = taxBeforeCess * 0.04;
   const totalIncomeTax = taxBeforeCess + cess;
 
-  // Capital Gains Tax
-  const ltcgExemption = 100000; // Note: This is for equity. For simplicity, we use it for all LTCG.
+  // Capital Gains Tax (using rates from CapitalGainsPage for consistency)
+  const ltcgExemption = 150000;
   const taxableLtcg = Math.max(0, capitalGains.ltcg - ltcgExemption);
-  const ltcgTax = taxableLtcg * 0.10; // Simplified rate
-  const stcgTax = capitalGains.stcg * 0.15; // Simplified rate
+  const ltcgTax = taxableLtcg * 0.125;
+  const stcgTax = capitalGains.stcg * 0.20;
   const totalCapitalGainsTax = ltcgTax + stcgTax;
 
   const totalTaxPayable = totalIncomeTax + totalCapitalGainsTax;
@@ -140,7 +141,7 @@ const TaxComputationPage: React.FC = () => {
                   <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
                   <AlertDescription className="text-green-700 dark:text-green-400">
-                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero.
+                    Your taxable income is ₹10,00,000 or less, so your income tax liability is zero.
                   </AlertDescription>
                 </Alert>
               )}
