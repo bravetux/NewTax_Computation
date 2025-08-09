@@ -9,7 +9,7 @@ const IncomeTaxDashboard: React.FC = () => {
   const [fdIncome, setFdIncome] = useState<number | string>("");
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
           India Income Tax Planning Dashboard
