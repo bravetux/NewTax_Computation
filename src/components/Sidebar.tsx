@@ -74,7 +74,7 @@ const Sidebar = () => {
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-1">
             <NavLink to="/income-summary" className={incomeNavLinkClass}><BarChart2 className="mr-3 h-4 w-4" />Summary</NavLink>
-            <a href="/tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
+            <a href="/income-summary#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
             <NavLink to="/rental-income" className={incomeNavLinkClass}><Home className="mr-3 h-4 w-4" />Rental</NavLink>
             <NavLink to="/fd-income" className={incomeNavLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</NavLink>
             <NavLink to="/bonds" className={incomeNavLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</NavLink>

@@ -119,7 +119,7 @@ const IncomeSummaryPage: React.FC = () => {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
+          <Card id="salary-income">
             <CardHeader><CardTitle>Salary Income</CardTitle></CardHeader>
             <CardContent>
               <IncomeField label="Gross Salary" id="salaryIncome" value={salaryIncome} onChange={(e) => setSalaryIncome(e.target.value)} placeholder="Enter salary income" />

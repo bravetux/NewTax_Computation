@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import IncomeField from "@/components/IncomeField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
@@ -10,6 +9,7 @@ const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-b
 const bondIncomeSource = "dyad-bonds-income";
 const fdIncomeSource = "dyad-fd-income";
 const rentalIncomeSource = "dyad-rental-income";
+const salaryIncomeSource = "dyad-salary-income";
 
 const DEMAT_KEY = "dyad-demat-gains";
 const MF_KEY = "dyad-mutual-fund-gains";
@@ -21,10 +21,9 @@ interface CapitalGainsItem {
 }
 
 const IncomePage: React.FC = () => {
-  const [salaryIncome, setSalaryIncome] = useState<number | string>("");
+  const [salaryIncome, setSalaryIncome] = useState(0);
   const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
-  const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
   const [totalBondIncome, setTotalBondIncome] = useState(0);
   const [totalCapitalGainsTax, setTotalCapitalGainsTax] = useState(0);
@@ -33,7 +32,11 @@ const IncomePage: React.FC = () => {
 
   useEffect(() => {
     const calculateTotals = () => {
-      // Dividend Income
+      try {
+        const savedSalary = localStorage.getItem(salaryIncomeSource);
+        setSalaryIncome(savedSalary ? JSON.parse(savedSalary) : 0);
+      } catch {}
+
       let dividendTotal = 0;
       dividendSources.forEach(key => {
         try {
@@ -44,7 +47,6 @@ const IncomePage: React.FC = () => {
       });
       setTotalDividendIncome(dividendTotal);
 
-      // Bond Income
       let bondTotal = 0;
       try {
         const savedBondData = localStorage.getItem(bondIncomeSource);
@@ -53,7 +55,6 @@ const IncomePage: React.FC = () => {
       } catch {}
       setTotalBondIncome(bondTotal);
 
-      // FD Income
       let fdTotal = 0;
       try {
         const savedFdData = localStorage.getItem(fdIncomeSource);
@@ -62,7 +63,6 @@ const IncomePage: React.FC = () => {
       } catch {}
       setTotalFdIncome(fdTotal);
 
-      // Rental Income
       let rentalTotal = 0;
       try {
         const savedRentalData = localStorage.getItem(rentalIncomeSource);
@@ -77,11 +77,9 @@ const IncomePage: React.FC = () => {
             return total + taxableIncome;
         }, 0);
         rentalTotal = totalNetIncome;
-
       } catch {}
       setTotalRentalIncome(rentalTotal);
 
-      // Capital Gains Tax Calculation
       const calculateGainsTotals = (key: string): { stcg: number; ltcg: number } => {
         try {
           const savedData = localStorage.getItem(key);
@@ -126,7 +124,6 @@ const IncomePage: React.FC = () => {
     (Number(salaryIncome) || 0) +
     totalRentalIncome +
     totalFdIncome +
-    (Number(speculativeIncome) || 0) +
     totalDividendIncome +
     totalBondIncome;
 
@@ -137,89 +134,42 @@ const IncomePage: React.FC = () => {
           Tax Dashboard
         </h1>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Overall Income Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg">
-              Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              (Capital gains are managed and taxed separately.)
-            </p>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card id="salary-income">
-            <CardHeader><CardTitle>Salary Income</CardTitle></CardHeader>
-            <CardContent>
-              <IncomeField label="Gross Salary" id="salaryIncome" value={salaryIncome} onChange={(e) => setSalaryIncome(e.target.value)} placeholder="Enter salary income" />
-            </CardContent>
-          </Card>
-          <Card id="rental-income">
-            <CardHeader><CardTitle>Rental Property Income</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalRentalIncome.toLocaleString("en-IN")}</p>
-              <Link to="/rental-income">
-                <Button variant="outline">Manage Properties <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card id="fd-income">
-            <CardHeader><CardTitle>FD Interest Income</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalFdIncome.toLocaleString("en-IN")}</p>
-              <Link to="/fd-income">
-                <Button variant="outline">Manage FDs <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card id="bond-income">
-            <CardHeader><CardTitle>Bonds Interest Income</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
-              <Link to="/bonds">
-                <Button variant="outline">Manage Bonds <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </CardContent>
-          </Card>
+        <div className="space-y-8">
           <Card>
-            <CardHeader><CardTitle>Speculative Income</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Overall Income Summary</CardTitle>
+            </CardHeader>
             <CardContent>
-              <IncomeField label="Profit from Speculation" id="speculativeIncome" value={speculativeIncome} onChange={(e) => setSpeculativeIncome(e.target.value)} placeholder="Enter speculative income" />
+              <p className="text-xl font-bold">
+                Total Income (excluding capital gains): ₹{totalIncome.toLocaleString("en-IN")}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This is the total of your salary, rental, FD, bond, and dividend income.
+                Manage these on the <Link to="/income-summary" className="underline">Income Summary</Link> page.
+              </p>
             </CardContent>
           </Card>
-          <Card id="dividend-income">
-            <CardHeader><CardTitle>Dividend Income</CardTitle></CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold mb-4">₹{totalDividendIncome.toLocaleString("en-IN")}</p>
-              <Link to="/dividends">
-                <Button variant="outline">Manage Dividends <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Card id="capital-gains-summary">
-            <CardHeader><CardTitle>Capital Gains</CardTitle></CardHeader>
+
+          <Card>
+            <CardHeader><CardTitle>Capital Gains Summary</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span>Total STCG:</span>
+                  <span>Total Short-Term Gains (STCG):</span>
                   <span className="font-semibold">₹{totalStcg.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Total LTCG:</span>
+                  <span>Total Long-Term Gains (LTCG):</span>
                   <span className="font-semibold">₹{totalLtcg.toLocaleString("en-IN")}</span>
                 </div>
                 <hr className="my-2" />
-                <div className="flex justify-between font-medium">
-                  <span>Tax Payable:</span>
-                  <span className="font-bold">₹{totalCapitalGainsTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total Tax Payable:</span>
+                  <span>₹{totalCapitalGainsTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
               <Link to="/capital-gains">
-                <Button variant="outline" className="w-full">View Details <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                <Button variant="outline" className="w-full">View Detailed Breakdown <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
             </CardContent>
           </Card>
