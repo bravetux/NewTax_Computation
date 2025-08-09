@@ -107,19 +107,96 @@ const PlanWithAiPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const toastId = showLoading("Simulating AI response...");
+    if (!apiKey) {
+      showError("Please enter an API key.");
+      return;
+    }
+
+    const toastId = showLoading("Contacting AI...");
     setIsLoading(true);
     setResponse("");
 
-    const fullPrompt = `That you are expert Tax Planner, my income and tax details are follows ${financialData || 'No financial data was loaded.'}\n\n${userPrompt}`;
-    console.log("Full prompt for AI:", fullPrompt); // For debugging
+    const fullPrompt = `As an expert Tax Planner, analyze the following financial data and address the user's request. Financial Data: ${financialData || 'No financial data was loaded.'}\n\nUser Request: ${userPrompt}`;
 
-    setTimeout(() => {
+    let endpoint = "";
+    let headers: Record<string, string> = { "Content-Type": "application/json" };
+    let body: Record<string, any> = {};
+
+    try {
+      switch (provider) {
+        case "openai":
+          endpoint = "https://api.openai.com/v1/chat/completions";
+          headers["Authorization"] = `Bearer ${apiKey}`;
+          body = {
+            model: selectedModel,
+            messages: [
+              { role: "system", content: "You are an expert Tax Planner for Indian tax laws." },
+              { role: "user", content: fullPrompt },
+            ],
+          };
+          break;
+
+        case "google":
+          endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+          body = {
+            contents: [{ parts: [{ text: fullPrompt }] }],
+          };
+          break;
+
+        case "openrouter":
+          endpoint = "https://openrouter.ai/api/v1/chat/completions";
+          headers["Authorization"] = `Bearer ${apiKey}`;
+          headers["HTTP-Referer"] = window.location.href;
+          headers["X-Title"] = "Dyad Tax Planner";
+          body = {
+            model: selectedModel,
+            messages: [{ role: "user", content: fullPrompt }],
+          };
+          break;
+        
+        default:
+          throw new Error("Unsupported provider");
+      }
+
+      const apiResponse = await fetch(endpoint, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
+      });
+
+      if (!apiResponse.ok) {
+        const errorData = await apiResponse.json();
+        throw new Error(errorData.error?.message || `API Error: ${apiResponse.statusText}`);
+      }
+
+      const data = await apiResponse.json();
+      let aiResponse = "";
+
+      switch (provider) {
+        case "openai":
+        case "openrouter":
+          aiResponse = data.choices[0]?.message?.content;
+          break;
+        case "google":
+          aiResponse = data.candidates[0]?.content?.parts[0]?.text;
+          break;
+      }
+
+      if (!aiResponse) {
+        throw new Error("Could not parse AI response.");
+      }
+
+      setResponse(aiResponse);
+      showSuccess("AI response received!");
+
+    } catch (error: any) {
+      console.error("AI API Error:", error);
+      showError(error.message || "An unknown error occurred.");
+      setResponse(`Error: ${error.message}`);
+    } finally {
       dismissToast(toastId);
-      showError("This is a UI demonstration. Connecting to live AI models requires a secure backend to protect your API key and cannot be done directly from the browser.");
-      setResponse("This is a mock response demonstrating the UI. In a real application, the AI's answer, based on your financial data and prompt, would appear here. For example, it might suggest investing in ELSS funds, making voluntary provident fund contributions, or maximizing deductions under Section 80C.");
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
