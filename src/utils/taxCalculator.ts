@@ -11,8 +11,8 @@ export interface DetailedIncome {
 export interface TaxCalculationResult {
   // Inputs
   grossSlabIncome: number;
-  stcg: number;
-  ltcg: number;
+  originalStcg: number;
+  originalLtcg: number;
 
   // Slab Tax Calculation
   standardDeduction: number;
@@ -25,6 +25,9 @@ export interface TaxCalculationResult {
   totalIncomeTax: number;
 
   // Capital Gains Tax Calculation
+  stclSetOff: number;
+  postSetOffStcg: number;
+  postSetOffLtcg: number;
   ltcgExemption: number;
   taxableLtcg: number;
   ltcgTax: number;
@@ -59,11 +62,25 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
   const cess = taxBeforeCess * 0.04;
   const totalIncomeTax = taxBeforeCess + cess;
 
-  // 2. Calculate tax on capital gains
-  const ltcgExemption = 150000;
-  const taxableLtcg = Math.max(0, details.ltcg - ltcgExemption);
+  // 2. Handle Capital Gains, including loss set-off
+  const { stcg: originalStcg, ltcg: originalLtcg } = details;
+  let stclSetOff = 0;
+  let postSetOffStcg = originalStcg;
+  let postSetOffLtcg = originalLtcg;
+
+  if (originalStcg < 0 && originalLtcg > 0) {
+    stclSetOff = Math.min(Math.abs(originalStcg), originalLtcg);
+    postSetOffLtcg = originalLtcg - stclSetOff;
+    postSetOffStcg = originalStcg + stclSetOff;
+  }
+
+  const stcgForTax = Math.max(0, postSetOffStcg);
+  const ltcgForTax = Math.max(0, postSetOffLtcg);
+
+  const ltcgExemption = 125000;
+  const taxableLtcg = Math.max(0, ltcgForTax - ltcgExemption);
   const ltcgTax = taxableLtcg * 0.125;
-  const stcgTax = details.stcg * 0.20;
+  const stcgTax = stcgForTax * 0.20;
   const totalCapitalGainsTax = ltcgTax + stcgTax;
 
   // 3. Total tax payable
@@ -71,8 +88,8 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
 
   return {
     grossSlabIncome,
-    stcg: details.stcg,
-    ltcg: details.ltcg,
+    originalStcg,
+    originalLtcg,
     standardDeduction,
     netTaxableSlabIncome,
     isRebateApplicable,
@@ -81,6 +98,9 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
     taxBeforeCess,
     cess,
     totalIncomeTax,
+    stclSetOff,
+    postSetOffStcg,
+    postSetOffLtcg,
     ltcgExemption,
     taxableLtcg,
     ltcgTax,
