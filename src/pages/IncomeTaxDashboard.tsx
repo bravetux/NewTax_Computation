@@ -100,7 +100,7 @@ const IncomeTaxDashboard: React.FC = () => {
             </CardContent>
           </Card>
           <Card id="bond-income">
-            <CardHeader><CardTitle>Bond Income</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Bonds Interest Income</CardTitle></CardHeader>
             <CardContent>
               <p className="text-2xl font-bold mb-4">₹{totalBondIncome.toLocaleString("en-IN")}</p>
               <Link to="/bonds">

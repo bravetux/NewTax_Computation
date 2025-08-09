@@ -126,7 +126,7 @@ const BondsPage: React.FC = () => {
         </Link>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
-            Bond Income
+            Bonds Interest Income
           </h1>
           <div className="flex items-center gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv, .xlsx, .xls" className="hidden" />
@@ -138,13 +138,13 @@ const BondsPage: React.FC = () => {
         <Card className="mb-8">
           <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-xl font-semibold">Total Bond Income: ₹{totalIncome.toLocaleString("en-IN")}</p>
+            <p className="text-xl font-semibold">Total Bonds Interest Income: ₹{totalIncome.toLocaleString("en-IN")}</p>
           </CardContent>
         </Card>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Bond Income Details</CardTitle>
+            <CardTitle>Bonds Interest Income Details</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
