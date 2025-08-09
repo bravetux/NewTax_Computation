@@ -7,7 +7,7 @@ import IncomeField from "@/components/IncomeField";
 
 const LOCAL_STORAGE_KEY = "dyad-salary-income";
 
-const SalaryPage: React.FC = () => {
+const SalaryIncomePage: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -52,4 +52,4 @@ const SalaryPage: React.FC = () => {
   );
 };
 
-export default SalaryPage;
+export default SalaryIncomePage;
