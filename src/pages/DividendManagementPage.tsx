@@ -102,6 +102,53 @@ const DividendManagementPage: React.FC = () => {
 
   const totalDividends = dividends.reduce((sum, item) => sum + item.amount, 0);
 
+  const DetailsCard = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Dividend Details</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Particulars</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dividends.length > 0 ? (
+              dividends.map((div, index) => (
+                <TableRow key={index}>
+                  <TableCell>{new Date(div.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{div.particulars}</TableCell>
+                  <TableCell className="text-right">₹{div.amount.toLocaleString("en-IN")}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center">No dividends imported yet.</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+
+  const SummaryCard = (
+    <Card>
+      <CardHeader>
+        <CardTitle>Summary</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-xl font-semibold">
+          Total Dividends: ₹{totalDividends.toLocaleString("en-IN")}
+        </p>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
@@ -125,48 +172,19 @@ const DividendManagementPage: React.FC = () => {
           />
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dividend Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Particulars</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {dividends.length > 0 ? (
-                  dividends.map((div, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(div.date).toLocaleDateString()}</TableCell>
-                      <TableCell>{div.particulars}</TableCell>
-                      <TableCell className="text-right">₹{div.amount.toLocaleString("en-IN")}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center">No dividends imported yet.</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">
-              Total Dividends: ₹{totalDividends.toLocaleString("en-IN")}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="space-y-8">
+          {source === 'broker1' || source === 'broker2' ? (
+            <>
+              {SummaryCard}
+              {DetailsCard}
+            </>
+          ) : (
+            <>
+              {DetailsCard}
+              {SummaryCard}
+            </>
+          )}
+        </div>
       </div>
       <MadeWithDyad />
     </div>
