@@ -79,7 +79,7 @@ const TaxComputationPage: React.FC = () => {
   const standardDeduction = income.salary > 0 ? 50000 : 0;
   const netTaxableIncome = Math.max(0, grossTotalIncome - standardDeduction);
 
-  const hasRebate = netTaxableIncome <= 700000;
+  const hasRebate = netTaxableIncome <= 1200000;
 
   const calculateSlabTax = (inc: number) => {
     if (inc <= 300000) return 0;
@@ -140,7 +140,7 @@ const TaxComputationPage: React.FC = () => {
                   <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
                   <AlertDescription className="text-green-700 dark:text-green-400">
-                    Your taxable income is ₹7,00,000 or less, so your income tax liability is zero.
+                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero.
                   </AlertDescription>
                 </Alert>
               )}
