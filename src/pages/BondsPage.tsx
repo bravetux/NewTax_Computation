@@ -7,8 +7,6 @@ import { Download, Upload, PlusCircle, ArrowLeft, Gift } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { showSuccess, showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
-import * as XLSX from "xlsx";
-import Papa from "papaparse";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Bond {
@@ -82,49 +80,39 @@ const BondsPage: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const processData = (data: any[]) => {
-      const parsedData = data
-        .map((row: any) => ({
-          name: String(row.name || row.Name || row['Bond Name'] || ''),
-          isin: String(row.isin || row.ISIN || ''),
-          income: row.income || row.Income || 0,
-        }))
-        .filter(item => item.name && item.isin && !isNaN(parseFloat(String(item.income))));
-      
-      if (parsedData.length > 0) {
-        setBonds(parsedData);
-        showSuccess("Bond data imported successfully!");
-      } else {
-        showError("No valid bond data found. Please check column names (e.g., name, isin, income).");
+    if (!file.name.endsWith(".json")) {
+      showError("Unsupported file type. Please use a .json file.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== "string") {
+          showError("Could not read file content.");
+          return;
+        }
+        
+        const importedData = JSON.parse(text);
+        const isValid = (data: any) => Array.isArray(data) && data.every(item => "name" in item && "isin" in item && "income" in item);
+
+        if (importedData.bonds && isValid(importedData.bonds)) {
+          setBonds(importedData.bonds);
+          showSuccess("Bond data imported successfully!");
+        } else {
+          showError("Invalid or empty JSON file format. Expected a 'bonds' array.");
+        }
+      } catch (error) {
+        showError("Failed to parse JSON file.");
+      } finally {
+        if (event.target) {
+          event.target.value = "";
+        }
       }
     };
-
-    if (file.name.endsWith(".csv")) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => processData(result.data),
-        error: () => showError("Failed to parse CSV."),
-      });
-    } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json(worksheet);
-          processData(json);
-        } catch (err) {
-          showError("Failed to parse Excel file.");
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      showError("Unsupported file type. Please use CSV or XLSX.");
-    }
-    event.target.value = "";
+    reader.readAsText(file);
   };
 
   const handleGiftInterest = () => {
@@ -169,7 +157,7 @@ const BondsPage: React.FC = () => {
             Bonds Interest Income
           </h1>
           <div className="flex items-center gap-2">
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv, .xlsx, .xls" className="hidden" />
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
             <Button variant="outline" onClick={handleImportClick}><Upload className="mr-2 h-4 w-4" /> Import</Button>
             <Button variant="outline" onClick={handleExport}><Download className="mr-2 h-4 w-4" /> Export</Button>
           </div>
