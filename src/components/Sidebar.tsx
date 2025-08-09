@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 const Sidebar = () => {
   const location = useLocation();
+  const [isIncomeOpen, setIsIncomeOpen] = useState(true);
   const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(true);
   const [isDividendsOpen, setIsDividendsOpen] = useState(true);
 
@@ -66,14 +67,19 @@ const Sidebar = () => {
           Dashboard
         </NavLink>
         
-        <div className="space-y-1 pt-2">
-          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Income</p>
-          <NavLink to="/income-summary" className={incomeNavLinkClass}><BarChart2 className="mr-3 h-4 w-4" />Summary</NavLink>
-          <a href="/tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
-          <NavLink to="/rental-income" className={incomeNavLinkClass}><Home className="mr-3 h-4 w-4" />Rental</NavLink>
-          <NavLink to="/fd-income" className={incomeNavLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</NavLink>
-          <NavLink to="/bonds" className={incomeNavLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</NavLink>
-        </div>
+        <Collapsible open={isIncomeOpen} onOpenChange={setIsIncomeOpen} className="space-y-1 pt-2">
+          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Income</p>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", isIncomeOpen && "rotate-180")} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1">
+            <NavLink to="/income-summary" className={incomeNavLinkClass}><BarChart2 className="mr-3 h-4 w-4" />Summary</NavLink>
+            <a href="/tax-dashboard#salary-income" className={hashLinkClass}><Wallet className="mr-3 h-4 w-4" />Salary</a>
+            <NavLink to="/rental-income" className={incomeNavLinkClass}><Home className="mr-3 h-4 w-4" />Rental</NavLink>
+            <NavLink to="/fd-income" className={incomeNavLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</NavLink>
+            <NavLink to="/bonds" className={incomeNavLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</NavLink>
+          </CollapsibleContent>
+        </Collapsible>
 
         <Collapsible open={isCapitalGainsOpen} onOpenChange={setIsCapitalGainsOpen} className="space-y-1 pt-2">
           <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
