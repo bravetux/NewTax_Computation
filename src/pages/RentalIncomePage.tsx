@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { ArrowLeft } from "lucide-react";
-import { showError } from "@/utils/toast";
+import { ArrowLeft, Upload, Download } from "lucide-react";
+import { showError, showSuccess } from "@/utils/toast";
 import IncomeField from "@/components/IncomeField";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
 
 interface Property {
   monthlyRent: number | string;
@@ -28,6 +31,8 @@ const RentalIncomePage: React.FC = () => {
     return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "" });
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(properties));
     window.dispatchEvent(new Event('storage')); // Notify dashboard
@@ -46,6 +51,94 @@ const RentalIncomePage: React.FC = () => {
     const standardDeduction = nav > 0 ? nav * 0.3 : 0;
     const taxableIncome = nav - standardDeduction;
     return { gav, nav, standardDeduction, taxableIncome };
+  };
+
+  const handleExport = () => {
+    const dataToExport = { properties };
+    const dataStr = JSON.stringify(dataToExport, null, 2);
+    const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const exportFileDefaultName = "rental-income.json";
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    document.body.appendChild(linkElement);
+    linkElement.click();
+    document.body.removeChild(linkElement);
+    showSuccess("Rental data exported successfully!");
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const processSheetData = (data: any[]) => {
+      const parsedData = data
+        .map((row: any) => ({
+          monthlyRent: row.monthlyRent || row['Monthly Rent'] || 0,
+          monthsRented: row.monthsRented || row['Months Rented'] || 0,
+          propertyTax: row.propertyTax || row['Property Tax'] || 0,
+        }))
+        .filter(item => !isNaN(parseFloat(String(item.monthlyRent))) && !isNaN(parseFloat(String(item.monthsRented))));
+      
+      if (parsedData.length > 0) {
+        setProperties(parsedData);
+        showSuccess("Rental data imported successfully!");
+      } else {
+        showError("No valid rental data found. Please check column names (e.g., monthlyRent, monthsRented, propertyTax).");
+      }
+    };
+
+    if (file.name.endsWith(".json")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result;
+          if (typeof text !== "string") return;
+          
+          const importedData = JSON.parse(text);
+          const isValid = (data: any) => Array.isArray(data) && data.every(item => "monthlyRent" in item && "monthsRented" in item && "propertyTax" in item);
+
+          if (isValid(importedData.properties)) {
+            setProperties(importedData.properties);
+            showSuccess("Rental data imported successfully!");
+          } else {
+            showError("Invalid or empty JSON file format. Expected a 'properties' array.");
+          }
+        } catch (error) {
+          showError("Failed to parse JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    } else if (file.name.endsWith(".csv")) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (result) => processSheetData(result.data),
+        error: () => showError("Failed to parse CSV."),
+      });
+    } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet);
+          processSheetData(json);
+        } catch (err) {
+          showError("Failed to parse Excel file.");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      showError("Unsupported file type. Please use JSON, CSV, or XLSX.");
+    }
+    event.target.value = "";
   };
 
   const totals = properties.reduce(
@@ -79,6 +172,11 @@ const RentalIncomePage: React.FC = () => {
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
             Rental Property Income
           </h1>
+          <div className="flex items-center gap-2">
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json, .csv, .xlsx, .xls" className="hidden" />
+            <Button variant="outline" onClick={handleImportClick}><Upload className="mr-2 h-4 w-4" /> Import</Button>
+            <Button variant="outline" onClick={handleExport}><Download className="mr-2 h-4 w-4" /> Export</Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
