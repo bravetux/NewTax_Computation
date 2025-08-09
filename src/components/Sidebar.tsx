@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 const Sidebar = () => {
   const location = useLocation();
   const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(true);
+  const [isDividendsOpen, setIsDividendsOpen] = useState(true);
 
   const isCapitalGainsActive = 
     location.pathname.startsWith('/capital-gains') ||
@@ -66,7 +67,6 @@ const Sidebar = () => {
           <a href="/income-tax-dashboard#rental-income" className={hashLinkClass}><Home className="mr-3 h-4 w-4" />Rental</a>
           <a href="/income-tax-dashboard#fd-income" className={hashLinkClass}><Landmark className="mr-3 h-4 w-4" />FD</a>
           <a href="/income-tax-dashboard#bond-income" className={hashLinkClass}><FileText className="mr-3 h-4 w-4" />Bond</a>
-          <NavLink to="/dividends" className={subNavLinkClass} end><PieChart className="mr-3 h-4 w-4" />Dividend Summary</NavLink>
         </div>
 
         <Collapsible open={isCapitalGainsOpen} onOpenChange={setIsCapitalGainsOpen} className="space-y-1 pt-2">
@@ -90,25 +90,30 @@ const Sidebar = () => {
           </CollapsibleContent>
         </Collapsible>
 
-        <div className="space-y-1 pt-2">
-          <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dividends</p>
-          <NavLink to="/dividends" className={subNavLinkClass} end>
-            <PieChart className="mr-3 h-4 w-4" />
-            Summary
-          </NavLink>
-          <NavLink to="/dividends/pms" className={subNavLinkClass}>
-            <Briefcase className="mr-3 h-4 w-4" />
-            PMS
-          </NavLink>
-          <NavLink to="/dividends/broker1" className={subNavLinkClass}>
-            <Library className="mr-3 h-4 w-4" />
-            Broker 1
-          </NavLink>
-          <NavLink to="/dividends/broker2" className={subNavLinkClass}>
-            <Library className="mr-3 h-4 w-4" />
-            Broker 2
-          </NavLink>
-        </div>
+        <Collapsible open={isDividendsOpen} onOpenChange={setIsDividendsOpen} className="space-y-1 pt-2">
+          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Dividends</p>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", isDividendsOpen && "rotate-180")} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1">
+            <NavLink to="/dividends" className={subNavLinkClass} end>
+              <PieChart className="mr-3 h-4 w-4" />
+              Summary
+            </NavLink>
+            <NavLink to="/dividends/pms" className={subNavLinkClass}>
+              <Briefcase className="mr-3 h-4 w-4" />
+              PMS
+            </NavLink>
+            <NavLink to="/dividends/broker1" className={subNavLinkClass}>
+              <Library className="mr-3 h-4 w-4" />
+              Broker 1
+            </NavLink>
+            <NavLink to="/dividends/broker2" className={subNavLinkClass}>
+              <Library className="mr-3 h-4 w-4" />
+              Broker 2
+            </NavLink>
+          </CollapsibleContent>
+        </Collapsible>
       </nav>
     </div>
   );
