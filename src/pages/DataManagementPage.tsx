@@ -29,7 +29,7 @@ const LOCAL_STORAGE_KEYS = {
   salaryIncome: "dyad-salary-income",
 };
 
-const ReportsPage: React.FC = () => {
+const DataManagementPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -137,7 +137,7 @@ const ReportsPage: React.FC = () => {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          Reports & Data Management
+          Data Management
         </h1>
         <Card>
           <CardHeader>
@@ -193,4 +193,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage;
+export default DataManagementPage;

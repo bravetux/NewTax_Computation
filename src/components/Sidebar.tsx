@@ -134,11 +134,11 @@ const Sidebar = () => {
         
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
             <NavLink
-              to="/reports"
+              to="/data-management"
               className={({isActive}) => mainNavLinkClass(isActive)}
             >
               <FileText className="mr-3 h-5 w-5" />
-              Reports
+              Data Management
             </NavLink>
             <NavLink
               to="/plan-with-ai"

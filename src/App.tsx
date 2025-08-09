@@ -17,7 +17,7 @@ import FDIncomePage from "./pages/FDIncomePage";
 import RentalIncomePage from "./pages/RentalIncomePage";
 import IncomeSummaryPage from "./pages/IncomeSummaryPage";
 import TaxComputationPage from "./pages/TaxComputationPage";
-import ReportsPage from "./pages/ReportsPage";
+import DataManagementPage from "./pages/DataManagementPage";
 import PlanWithAiPage from "./pages/PlanWithAiPage";
 
 const queryClient = new QueryClient();
@@ -77,8 +77,8 @@ const App = () => (
               element={<RentalIncomePage />}
             />
             <Route
-              path="/reports"
-              element={<ReportsPage />}
+              path="/data-management"
+              element={<DataManagementPage />}
             />
             <Route
               path="/plan-with-ai"
