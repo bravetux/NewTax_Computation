@@ -56,19 +56,40 @@ const DividendManagementPage: React.FC = () => {
     if (!file) return;
 
     const processData = (data: any[]) => {
+      const getVal = (row: any, keys: string[]) => {
+        const rowKey = Object.keys(row).find(k => keys.includes(k.toLowerCase().trim()));
+        return rowKey ? row[rowKey] : undefined;
+      };
+
       const parsedData = data
-        .map((row: any) => ({
-          date: String(row.date || row.Date || ""),
-          particulars: String(row.particulars || row.Particulars || ""),
-          amount: parseFloat(row.amount || row.Amount),
-        }))
+        .map((row: any) => {
+          const date = getVal(row, ['date']);
+          const particulars = getVal(row, ['particulars']);
+          const amount = getVal(row, ['amount', 'credit']);
+
+          let dateString = '';
+          if (date instanceof Date) {
+            const year = date.getFullYear();
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const day = ('0' + date.getDate()).slice(-2);
+            dateString = `${year}-${month}-${day}`;
+          } else if (date) {
+            dateString = String(date);
+          }
+
+          return {
+            date: dateString,
+            particulars: String(particulars || ""),
+            amount: parseFloat(String(amount || '0').replace(/,/g, '')),
+          };
+        })
         .filter(item => item.date && item.particulars && !isNaN(item.amount));
       
       if (parsedData.length > 0) {
         setDividends(parsedData);
-        showSuccess("Statement imported successfully!");
+        showSuccess(`${parsedData.length} dividend records imported successfully!`);
       } else {
-        showError("No valid dividend data found in the file. Please check the column names (date, particulars, amount).");
+        showError("No valid dividend data found. Please ensure your file has columns named 'Date', 'Particulars', and 'Amount' (or 'Credit').");
       }
     };
 
@@ -90,7 +111,8 @@ const DividendManagementPage: React.FC = () => {
           const json = XLSX.utils.sheet_to_json(worksheet);
           processData(json);
         } catch (err) {
-          showError("Failed to parse Excel file.");
+          console.error("File parsing error:", err);
+          showError("Failed to parse the Excel file. It might be corrupted or in an unsupported format.");
         }
       };
       reader.readAsArrayBuffer(file);
