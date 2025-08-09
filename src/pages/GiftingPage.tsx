@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import GiftingRecipientCard from '@/components/GiftingRecipientCard';
-import { calculateTax, DetailedIncome } from '@/utils/taxCalculator';
+import { calculateTax, DetailedIncome, TaxCalculationResult } from '@/utils/taxCalculator';
 
 interface Recipient {
   age: number | string;
@@ -12,22 +12,22 @@ interface Recipient {
   dividendIncome: number | string;
   stcg: number | string;
   ltcg: number | string;
-  taxLiable: number | null;
+  taxDetails: TaxCalculationResult | null;
 }
 
 const GiftingPage: React.FC = () => {
   const [recipients, setRecipients] = useState<Record<string, Recipient>>({
-    spouse: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxLiable: null },
-    mother: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxLiable: null },
-    father: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxLiable: null },
-    kid1: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxLiable: null },
-    kid2: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxLiable: null },
+    spouse: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+    mother: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+    father: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+    kid1: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
+    kid2: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
   });
 
   const handleStateChange = (recipient: keyof typeof recipients, field: keyof Recipient, value: any) => {
     setRecipients(prev => ({
       ...prev,
-      [recipient]: { ...prev[recipient], [field]: value, taxLiable: null },
+      [recipient]: { ...prev[recipient], [field]: value, taxDetails: null },
     }));
   };
 
@@ -44,11 +44,11 @@ const GiftingPage: React.FC = () => {
       ltcg: Number(recipient.ltcg) || 0,
     };
 
-    const tax = calculateTax(incomeDetails);
+    const taxDetails = calculateTax(incomeDetails);
     
     setRecipients(prev => ({
       ...prev,
-      [recipientKey]: { ...prev[recipientKey], taxLiable: tax },
+      [recipientKey]: { ...prev[recipientKey], taxDetails: taxDetails },
     }));
   };
 
@@ -87,7 +87,7 @@ const GiftingPage: React.FC = () => {
               ltcg={recipient.ltcg}
               onLtcgChange={(e) => handleStateChange(key, 'ltcg', e.target.value)}
 
-              taxLiable={recipient.taxLiable}
+              taxDetails={recipient.taxDetails}
               onComputeTax={() => handleComputeTax(key as keyof typeof recipients)}
             />
           ))}
