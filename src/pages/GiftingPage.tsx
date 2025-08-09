@@ -4,11 +4,11 @@ import GiftingRecipientCard from '@/components/GiftingRecipientCard';
 
 const GiftingPage: React.FC = () => {
   const [recipients, setRecipients] = useState({
-    spouse: { age: '', isWorking: false },
+    spouse: { age: '', isWorking: false, grossIncome: '' },
     kid1: { age: '' },
     kid2: { age: '' },
-    mother: { age: '', isWorking: false },
-    father: { age: '', isWorking: false },
+    mother: { age: '', isWorking: false, grossIncome: '' },
+    father: { age: '', isWorking: false, grossIncome: '' },
   });
 
   const handleAgeChange = (recipient: keyof typeof recipients, value: string) => {
@@ -22,6 +22,13 @@ const GiftingPage: React.FC = () => {
     setRecipients(prev => ({
       ...prev,
       [recipient]: { ...prev[recipient], isWorking: checked },
+    }));
+  };
+
+  const handleIncomeChange = (recipient: 'spouse' | 'mother' | 'father', value: string) => {
+    setRecipients(prev => ({
+      ...prev,
+      [recipient]: { ...prev[recipient], grossIncome: value },
     }));
   };
 
@@ -43,6 +50,8 @@ const GiftingPage: React.FC = () => {
             showWorkingToggle={true}
             isWorking={recipients.spouse.isWorking}
             onIsWorkingChange={(checked) => handleWorkingChange('spouse', checked)}
+            grossIncome={recipients.spouse.grossIncome}
+            onGrossIncomeChange={(e) => handleIncomeChange('spouse', e.target.value)}
           />
           <GiftingRecipientCard
             name="Kid 1"
@@ -63,6 +72,8 @@ const GiftingPage: React.FC = () => {
             showWorkingToggle={true}
             isWorking={recipients.mother.isWorking}
             onIsWorkingChange={(checked) => handleWorkingChange('mother', checked)}
+            grossIncome={recipients.mother.grossIncome}
+            onGrossIncomeChange={(e) => handleIncomeChange('mother', e.target.value)}
           />
           <GiftingRecipientCard
             name="Father"
@@ -71,6 +82,8 @@ const GiftingPage: React.FC = () => {
             showWorkingToggle={true}
             isWorking={recipients.father.isWorking}
             onIsWorkingChange={(checked) => handleWorkingChange('father', checked)}
+            grossIncome={recipients.father.grossIncome}
+            onGrossIncomeChange={(e) => handleIncomeChange('father', e.target.value)}
           />
         </div>
       </div>
