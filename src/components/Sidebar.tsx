@@ -21,9 +21,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 const Sidebar = () => {
   const location = useLocation();
-  const [isIncomeOpen, setIsIncomeOpen] = useState(true);
-  const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(true);
-  const [isDividendsOpen, setIsDividendsOpen] = useState(true);
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
+  const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(false);
+  const [isDividendsOpen, setIsDividendsOpen] = useState(false);
 
   const mainNavLinkClass = (isActive: boolean) =>
     cn(
