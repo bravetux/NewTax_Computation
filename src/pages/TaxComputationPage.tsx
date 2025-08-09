@@ -33,7 +33,7 @@ const TaxComputationPage: React.FC = () => {
   useEffect(() => {
     const calculateTotals = () => {
       // --- Income from other sources ---
-      const salary = JSON.parse(localStorage.getItem(salaryIncomeSource) || "0");
+      const salary = Number(JSON.parse(localStorage.getItem(salaryIncomeSource) || "0"));
       
       const rentalData: RentalProperty[] = JSON.parse(localStorage.getItem(rentalIncomeSource) || "[]");
       const rental = rentalData.reduce((total, prop) => {
