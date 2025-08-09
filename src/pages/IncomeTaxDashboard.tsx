@@ -111,7 +111,7 @@ const IncomeTaxDashboard: React.FC = () => {
               <Link to="/rental-income">
                 <Button variant="outline">Manage Properties <ArrowRight className="ml-2 h-4 w-4" /></Button>
               </Link>
-            </IframeContent>
+            </CardContent>
           </Card>
           <Card id="fd-income">
             <CardHeader><CardTitle>FD Interest Income</CardTitle></CardHeader>
