@@ -7,7 +7,7 @@ import IncomeField from "@/components/IncomeField";
 
 const LOCAL_STORAGE_KEY = "dyad-salary-income";
 
-const SalaryIncomePage: React.FC = () => {
+const SalaryIncomePage = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
