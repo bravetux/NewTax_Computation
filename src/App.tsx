@@ -16,6 +16,7 @@ import BondsPage from "./pages/BondsPage";
 import FDIncomePage from "./pages/FDIncomePage";
 import RentalIncomePage from "./pages/RentalIncomePage";
 import IncomeSummaryPage from "./pages/IncomeSummaryPage";
+import TaxComputationPage from "./pages/TaxComputationPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,10 @@ const App = () => (
             <Route
               path="/tax-dashboard"
               element={<IncomePage />}
+            />
+            <Route
+              path="/tax-computation"
+              element={<TaxComputationPage />}
             />
             <Route
               path="/income-summary"

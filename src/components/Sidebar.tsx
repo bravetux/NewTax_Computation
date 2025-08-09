@@ -13,6 +13,7 @@ import {
   Library,
   ChevronDown,
   BarChart2,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -65,6 +66,13 @@ const Sidebar = () => {
         >
           <LayoutDashboard className="mr-3 h-5 w-5" />
           Dashboard
+        </NavLink>
+        <NavLink
+          to="/tax-computation"
+          className={({isActive}) => mainNavLinkClass(isActive)}
+        >
+          <Calculator className="mr-3 h-5 w-5" />
+          Tax Computation
         </NavLink>
         
         <Collapsible open={isIncomeOpen} onOpenChange={setIsIncomeOpen} className="space-y-1 pt-2">
