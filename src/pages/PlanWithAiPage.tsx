@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
-import { Upload, Download, Save, Sparkles, Eye, EyeOff, Bot } from "lucide-react";
+import { Upload, Download, Save, Sparkles, Eye, EyeOff, Bot, Database } from "lucide-react";
 
 const AI_MODELS = {
   openai: ["gpt-4o-mini", "gpt-3.5-turbo"],
@@ -23,7 +23,8 @@ const PlanWithAiPage: React.FC = () => {
   const [prompt, setPrompt] = useState("Based on my income and capital gains data in this application, suggest some tax-saving strategies.");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const configFileInputRef = useRef<HTMLInputElement>(null);
+  const reportFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setSelectedModel(AI_MODELS[provider][0]);
@@ -59,6 +60,30 @@ const PlanWithAiPage: React.FC = () => {
         }
       } catch (err) {
         showError("Failed to parse configuration file.");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  };
+
+  const handleImportReport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const reportJson = e.target?.result as string;
+        if (!reportJson) {
+          showError("Could not read file content.");
+          return;
+        }
+        const userPrompt = prompt;
+        const newPrompt = `That you are expert Tax Planner, my income and tax details are follows ${reportJson}\n\n${userPrompt}`;
+        setPrompt(newPrompt);
+        showSuccess("Financial data loaded into prompt successfully!");
+      } catch (err) {
+        showError("Failed to read report file.");
       }
     };
     reader.readAsText(file);
@@ -139,10 +164,12 @@ const PlanWithAiPage: React.FC = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Import Config</Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => configFileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Import Config</Button>
                 <Button variant="outline" onClick={handleExportConfig}><Download className="mr-2 h-4 w-4" /> Export Config</Button>
-                <input type="file" ref={fileInputRef} onChange={handleImportConfig} accept=".json" className="hidden" />
+                <Button variant="outline" onClick={() => reportFileInputRef.current?.click()}><Database className="mr-2 h-4 w-4" /> Load Financial Data</Button>
+                <input type="file" ref={configFileInputRef} onChange={handleImportConfig} accept=".json" className="hidden" />
+                <input type="file" ref={reportFileInputRef} onChange={handleImportReport} accept=".json" className="hidden" />
               </div>
             </CardContent>
           </Card>
