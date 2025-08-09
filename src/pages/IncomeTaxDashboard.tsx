@@ -9,10 +9,11 @@ import { ArrowRight } from "lucide-react";
 const dividendSources = ["dyad-pms-dividends", "dyad-broker1-dividends", "dyad-broker2-dividends"];
 const bondIncomeSource = "dyad-bonds-income";
 const fdIncomeSource = "dyad-fd-income";
+const rentalIncomeSource = "dyad-rental-income";
 
 const IncomeTaxDashboard: React.FC = () => {
   const [salaryIncome, setSalaryIncome] = useState<number | string>("");
-  const [rentalIncome, setRentalIncome] = useState<number | string>("");
+  const [totalRentalIncome, setTotalRentalIncome] = useState(0);
   const [totalFdIncome, setTotalFdIncome] = useState(0);
   const [speculativeIncome, setSpeculativeIncome] = useState<number | string>("");
   const [totalDividendIncome, setTotalDividendIncome] = useState(0);
@@ -48,6 +49,21 @@ const IncomeTaxDashboard: React.FC = () => {
         fdTotal = items.reduce((sum, item) => sum + (Number(item.interest) || 0), 0);
       } catch {}
       setTotalFdIncome(fdTotal);
+
+      // Rental Income
+      let rentalTotal = 0;
+      try {
+        const savedRentalData = localStorage.getItem(rentalIncomeSource);
+        const properties: { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; }[] = savedRentalData ? JSON.parse(savedRentalData) : [];
+        
+        const totalGrossRent = properties.reduce((total, prop) => total + ((Number(prop.monthlyRent) || 0) * (Number(prop.monthsRented) || 0)), 0);
+        const totalPropertyTax = properties.reduce((total, prop) => total + (Number(prop.propertyTax) || 0), 0);
+        const netAnnualValue = totalGrossRent - totalPropertyTax;
+        const standardDeduction = netAnnualValue > 0 ? netAnnualValue * 0.3 : 0;
+        rentalTotal = netAnnualValue - standardDeduction;
+
+      } catch {}
+      setTotalRentalIncome(rentalTotal);
     };
 
     calculateTotals();
@@ -64,7 +80,7 @@ const IncomeTaxDashboard: React.FC = () => {
 
   const totalIncome =
     (Number(salaryIncome) || 0) +
-    (Number(rentalIncome) || 0) +
+    totalRentalIncome +
     totalFdIncome +
     (Number(speculativeIncome) || 0) +
     totalDividendIncome +
@@ -87,7 +103,10 @@ const IncomeTaxDashboard: React.FC = () => {
           <Card id="rental-income">
             <CardHeader><CardTitle>Rental Property Income</CardTitle></CardHeader>
             <CardContent>
-              <IncomeField label="Annual Rent Received" id="rentalIncome" value={rentalIncome} onChange={(e) => setRentalIncome(e.target.value)} placeholder="Enter rental income" />
+              <p className="text-2xl font-bold mb-4">₹{totalRentalIncome.toLocaleString("en-IN")}</p>
+              <Link to="/rental-income">
+                <Button variant="outline">Manage Properties <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </Link>
             </CardContent>
           </Card>
           <Card id="fd-income">
