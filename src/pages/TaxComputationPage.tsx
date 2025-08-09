@@ -76,20 +76,21 @@ const TaxComputationPage: React.FC = () => {
 
   // --- Tax Calculation Logic ---
   const grossTotalIncome = Object.values(income).reduce((sum, val) => sum + val, 0);
-  const standardDeduction = income.salary > 0 ? 50000 : 0;
+  const standardDeduction = income.salary > 0 ? 75000 : 0;
   const netTaxableIncome = Math.max(0, grossTotalIncome - standardDeduction);
 
-  const rebateIncomeLimit = 1200000; // User requested limit
+  const rebateIncomeLimit = 1200000;
   const hasRebate = netTaxableIncome <= rebateIncomeLimit;
 
   const calculateSlabTax = (inc: number) => {
-    if (inc <= 300000) return 0;
+    if (inc <= 400000) return 0;
     let tax = 0;
-    if (inc > 1500000) tax += (inc - 1500000) * 0.30;
-    if (inc > 1200000) tax += Math.min(inc, 1500000) > 1200000 ? (Math.min(inc, 1500000) - 1200000) * 0.20 : 0;
-    if (inc > 900000) tax += Math.min(inc, 1200000) > 900000 ? (Math.min(inc, 1200000) - 900000) * 0.15 : 0;
-    if (inc > 600000) tax += Math.min(inc, 900000) > 600000 ? (Math.min(inc, 900000) - 600000) * 0.10 : 0;
-    if (inc > 300000) tax += Math.min(inc, 600000) > 300000 ? (Math.min(inc, 600000) - 300000) * 0.05 : 0;
+    if (inc > 400000)  tax += (Math.min(inc, 800000) - 400000) * 0.05;
+    if (inc > 800000)  tax += (Math.min(inc, 1200000) - 800000) * 0.10;
+    if (inc > 1200000) tax += (Math.min(inc, 1600000) - 1200000) * 0.15;
+    if (inc > 1600000) tax += (Math.min(inc, 2000000) - 1600000) * 0.20;
+    if (inc > 2000000) tax += (Math.min(inc, 2400000) - 2000000) * 0.25;
+    if (inc > 2400000) tax += (inc - 2400000) * 0.30;
     return tax;
   };
 
@@ -141,7 +142,7 @@ const TaxComputationPage: React.FC = () => {
                   <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
                   <AlertDescription className="text-green-700 dark:text-green-400">
-                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero.
+                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero. With the standard deduction, this can push your "tax-free" limit to ₹12,75,000.
                   </AlertDescription>
                 </Alert>
               )}
