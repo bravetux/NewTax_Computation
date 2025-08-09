@@ -98,45 +98,47 @@ const CapitalGainsPage: React.FC = () => {
           </Card>
         </div>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Overall Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-lg">
-            <div className="flex justify-between"><span>Total Short-Term Capital Gains (STCG):</span> <span className="font-bold">₹{totalStcg.toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between"><span>Total Long-Term Capital Gains (LTCG):</span> <span className="font-bold">₹{totalLtcg.toLocaleString("en-IN")}</span></div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Overall Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-lg">
+                <div className="flex justify-between"><span>Total Short-Term Capital Gains (STCG):</span> <span className="font-bold">₹{totalStcg.toLocaleString("en-IN")}</span></div>
+                <div className="flex justify-between"><span>Total Long-Term Capital Gains (LTCG):</span> <span className="font-bold">₹{totalLtcg.toLocaleString("en-IN")}</span></div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Capital Gains Tax Calculation</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <h3 className="font-semibold mb-2">Long-Term Capital Gains Tax</h3>
-              <div className="space-y-1 text-sm pl-4 border-l-2">
-                <div className="flex justify-between"><span>Total LTCG:</span> <span>₹{totalLtcg.toLocaleString("en-IN")}</span></div>
-                <div className="flex justify-between"><span>Exemption:</span> <span>- ₹{ltcgExemption.toLocaleString("en-IN")}</span></div>
-                <hr/>
-                <div className="flex justify-between font-medium"><span>Taxable LTCG:</span> <span>₹{taxableLtcg.toLocaleString("en-IN")}</span></div>
-                <div className="flex justify-between"><span>Tax on LTCG @ 12.5%:</span> <span className="font-semibold">₹{ltcgTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Short-Term Capital Gains Tax</h3>
-              <div className="space-y-1 text-sm pl-4 border-l-2">
-                <div className="flex justify-between"><span>Total STCG:</span> <span>₹{totalStcg.toLocaleString("en-IN")}</span></div>
-                <div className="flex justify-between"><span>Tax on STCG @ 20%:</span> <span className="font-semibold">₹{stcgTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
-              </div>
-            </div>
-            <hr className="my-4"/>
-            <div className="flex justify-between text-xl font-bold">
-              <span>Total Capital Gains Tax Payable:</span>
-              <span>₹{totalTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Capital Gains Tax Calculation</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <h3 className="font-semibold mb-2">Long-Term Capital Gains Tax</h3>
+                  <div className="space-y-1 text-sm pl-4 border-l-2">
+                    <div className="flex justify-between"><span>Total LTCG:</span> <span>₹{totalLtcg.toLocaleString("en-IN")}</span></div>
+                    <div className="flex justify-between"><span>Exemption:</span> <span>- ₹{ltcgExemption.toLocaleString("en-IN")}</span></div>
+                    <hr/>
+                    <div className="flex justify-between font-medium"><span>Taxable LTCG:</span> <span>₹{taxableLtcg.toLocaleString("en-IN")}</span></div>
+                    <div className="flex justify-between"><span>Tax on LTCG @ 12.5%:</span> <span className="font-semibold">₹{ltcgTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Short-Term Capital Gains Tax</h3>
+                  <div className="space-y-1 text-sm pl-4 border-l-2">
+                    <div className="flex justify-between"><span>Total STCG:</span> <span>₹{totalStcg.toLocaleString("en-IN")}</span></div>
+                    <div className="flex justify-between"><span>Tax on STCG @ 20%:</span> <span className="font-semibold">₹{stcgTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                  </div>
+                </div>
+                <hr className="my-4"/>
+                <div className="flex justify-between text-xl font-bold">
+                  <span>Total Capital Gains Tax Payable:</span>
+                  <span>₹{totalTax.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              </CardContent>
+            </Card>
+        </div>
       </div>
       <MadeWithDyad />
     </div>
