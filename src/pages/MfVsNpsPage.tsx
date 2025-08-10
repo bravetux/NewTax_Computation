@@ -30,6 +30,7 @@ interface MfResult {
   tax: number;
   postTaxCorpus: number;
   yearlyBondIncome: number | null;
+  monthlyBondIncome: number | null;
 }
 
 interface NpsResult {
@@ -80,9 +81,11 @@ const MfVsNpsPage: React.FC = () => {
       const mfPostTaxCorpus = mfFutureValue - mfTax;
       
       let yearlyBondIncome: number | null = null;
+      let monthlyBondIncome: number | null = null;
       if (mfInputs.transferToBonds) {
         const r_bond = (parseFloat(mfInputs.bondReturn) || 0) / 100;
         yearlyBondIncome = mfPostTaxCorpus * r_bond;
+        monthlyBondIncome = yearlyBondIncome / 12;
       }
 
       setMfResult({
@@ -90,6 +93,7 @@ const MfVsNpsPage: React.FC = () => {
         tax: mfTax,
         postTaxCorpus: mfPostTaxCorpus,
         yearlyBondIncome,
+        monthlyBondIncome,
       });
     } else {
       setMfResult(null);
@@ -210,12 +214,16 @@ const MfVsNpsPage: React.FC = () => {
                   <span>Post-Tax Corpus</span>
                   <span>₹{mfResult.postTaxCorpus.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                 </div>
-                {mfResult.yearlyBondIncome !== null && (
+                {mfResult.yearlyBondIncome !== null && mfResult.monthlyBondIncome !== null && (
                   <>
                     <Separator />
                     <div className="flex justify-between text-lg font-bold pt-2 text-green-600">
                       <span>Yearly Income from Bonds</span>
                       <span>₹{mfResult.yearlyBondIncome.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                    <div className="flex justify-between text-md font-semibold pt-1 text-green-600/90">
+                      <span>Monthly Income from Bonds</span>
+                      <span>₹{mfResult.monthlyBondIncome.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                     </div>
                   </>
                 )}
