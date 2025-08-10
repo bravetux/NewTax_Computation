@@ -162,36 +162,38 @@ const FDIncomePage: React.FC = () => {
           Maintain only your emergency fund—up to ₹5 lakh—in fixed deposits. If your FD interest is attracting high taxes, consider reallocating the excess to an arbitrage fund to reduce tax liability while targeting ~7% returns with capital preservation. For those with higher risk appetite, shifting part of the funds to Nifty 50 or Nifty Next 50 index funds can offer the potential for superior long-term growth.
         </p>
 
-        <Card className="mb-8">
-          <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">Total FD Interest Income: ₹{totalInterest.toLocaleString("en-IN")}</p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <Card>
+            <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-xl font-semibold">Total FD Interest Income: ₹{totalInterest.toLocaleString("en-IN")}</p>
+            </CardContent>
+          </Card>
 
-        <Card className="mb-8">
-          <CardHeader><CardTitle>Gift This Income</CardTitle></CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Action to be taken is Gift the entire the Principal Capital to the Family Member, so that future income is Zero.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <Select onValueChange={(value) => setSelectedRecipient(value as keyof typeof RECIPIENT_OPTIONS)} value={selectedRecipient}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Select a Recipient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(RECIPIENT_OPTIONS).map(([key, name]) => (
-                    <SelectItem key={key} value={key}>{name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button onClick={handleGiftInterest} disabled={!selectedRecipient || totalInterest <= 0}>
-                <Gift className="mr-2 h-4 w-4" /> Assign to Recipient
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader><CardTitle>Gift This Income</CardTitle></CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Action to be taken is Gift the entire the Principal Capital to the Family Member, so that future income is Zero.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <Select onValueChange={(value) => setSelectedRecipient(value as keyof typeof RECIPIENT_OPTIONS)} value={selectedRecipient}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue placeholder="Select a Recipient" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(RECIPIENT_OPTIONS).map(([key, name]) => (
+                      <SelectItem key={key} value={key}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleGiftInterest} disabled={!selectedRecipient || totalInterest <= 0}>
+                  <Gift className="mr-2 h-4 w-4" /> Assign to Recipient
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <Card className="mb-8">
           <CardHeader>
