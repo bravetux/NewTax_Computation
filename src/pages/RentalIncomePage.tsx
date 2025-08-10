@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { ArrowLeft, Upload, Download } from "lucide-react";
+import { ArrowLeft, Upload, Download, Info } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import IncomeField from "@/components/IncomeField";
 import * as XLSX from "xlsx";
@@ -11,6 +11,7 @@ import Papa from "papaparse";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Property {
   monthlyRent: number | string;
@@ -28,7 +29,6 @@ const RentalIncomePage: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure isSelfOccupied exists on loaded data
           return parsed.map(p => ({ ...p, isSelfOccupied: p.isSelfOccupied || false }));
         }
       }
@@ -42,7 +42,7 @@ const RentalIncomePage: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(properties));
-    window.dispatchEvent(new Event('storage')); // Notify dashboard
+    window.dispatchEvent(new Event('storage'));
   }, [properties]);
 
   const handleInputChange = (index: number, field: keyof Omit<Property, 'isSelfOccupied'>, value: string) => {
@@ -197,7 +197,7 @@ const RentalIncomePage: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-screen-2xl mx-auto">
         <Link to="/tax-dashboard" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:underline mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Tax Dashboard
@@ -213,7 +213,28 @@ const RentalIncomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <Alert className="mb-8 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+          <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <AlertTitle className="text-blue-800 dark:text-blue-300">Budget 2025 Simplification</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-400">
+            Now, if you own two houses and live in both (or can’t occupy one for valid reasons like job relocation), both can be considered self-occupied, with zero income declared from either.
+          </AlertDescription>
+        </Alert>
+
+        <Card className="mb-8">
+          <CardHeader><CardTitle>Overall Rental Income Summary</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between"><span>Total Gross Rental Income:</span> <span className="font-semibold">₹{totals.totalGrossRentalIncome.toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between"><span>Less: Total Property Tax Paid:</span> <span className="font-semibold">₹{totals.totalPropertyTax.toLocaleString("en-IN")}</span></div>
+            <hr className="my-1 border-gray-200 dark:border-gray-700" />
+            <div className="flex justify-between"><span>Total Net Annual Value:</span> <span className="font-semibold">₹{totals.totalNetAnnualValue.toLocaleString("en-IN")}</span></div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Less: Total 30% Standard Deduction:</span> <span className="font-semibold">₹{totals.totalStandardDeduction.toLocaleString("en-IN")}</span></div>
+            <hr className="my-1 border-gray-200 dark:border-gray-700" />
+            <div className="flex justify-between text-lg"><p className="font-bold">Total Net Income from House Property:</p><p className="font-bold">₹{totals.totalNetIncome.toLocaleString("en-IN")}</p></div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
           {properties.map((property, index) => {
             const { gav, nav, standardDeduction, taxableIncome } = calculatePropertyIncome(property);
             return (
@@ -243,19 +264,6 @@ const RentalIncomePage: React.FC = () => {
             );
           })}
         </div>
-
-        <Card>
-          <CardHeader><CardTitle>Overall Rental Income Summary</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex justify-between"><span>Total Gross Rental Income:</span> <span className="font-semibold">₹{totals.totalGrossRentalIncome.toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between"><span>Less: Total Property Tax Paid:</span> <span className="font-semibold">₹{totals.totalPropertyTax.toLocaleString("en-IN")}</span></div>
-            <hr className="my-1 border-gray-200 dark:border-gray-700" />
-            <div className="flex justify-between"><span>Total Net Annual Value:</span> <span className="font-semibold">₹{totals.totalNetAnnualValue.toLocaleString("en-IN")}</span></div>
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400"><span>Less: Total 30% Standard Deduction:</span> <span className="font-semibold">₹{totals.totalStandardDeduction.toLocaleString("en-IN")}</span></div>
-            <hr className="my-1 border-gray-200 dark:border-gray-700" />
-            <div className="flex justify-between text-lg"><p className="font-bold">Total Net Income from House Property:</p><p className="font-bold">₹{totals.totalNetIncome.toLocaleString("en-IN")}</p></div>
-          </CardContent>
-        </Card>
       </div>
       <MadeWithDyad />
     </div>
