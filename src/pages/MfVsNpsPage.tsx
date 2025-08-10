@@ -6,12 +6,15 @@ import { Button } from '@/components/ui/button';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { Calculator, TrendingUp, Shield } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 
 // State for inputs
 interface MfInputs {
   yearlyInvestment: string;
   investmentHorizon: string;
   mfReturn: string;
+  transferToBonds: boolean;
+  bondReturn: string;
 }
 
 interface NpsInputs {
@@ -26,6 +29,7 @@ interface MfResult {
   corpus: number;
   tax: number;
   postTaxCorpus: number;
+  yearlyBondIncome: number | null;
 }
 
 interface NpsResult {
@@ -40,6 +44,8 @@ const MfVsNpsPage: React.FC = () => {
     yearlyInvestment: '120000',
     investmentHorizon: '30',
     mfReturn: '12',
+    transferToBonds: false,
+    bondReturn: '9',
   });
 
   const [npsInputs, setNpsInputs] = useState<NpsInputs>({
@@ -52,7 +58,7 @@ const MfVsNpsPage: React.FC = () => {
   const [mfResult, setMfResult] = useState<MfResult | null>(null);
   const [npsResult, setNpsResult] = useState<NpsResult | null>(null);
 
-  const handleMfInputChange = (field: keyof MfInputs, value: string) => {
+  const handleMfInputChange = (field: keyof MfInputs, value: string | boolean) => {
     setMfInputs(prev => ({ ...prev, [field]: value }));
   };
 
@@ -72,10 +78,18 @@ const MfVsNpsPage: React.FC = () => {
       const mfGains = mfFutureValue - totalInvested_mf;
       const mfTax = mfGains * 0.1;
       const mfPostTaxCorpus = mfFutureValue - mfTax;
+      
+      let yearlyBondIncome: number | null = null;
+      if (mfInputs.transferToBonds) {
+        const r_bond = (parseFloat(mfInputs.bondReturn) || 0) / 100;
+        yearlyBondIncome = mfPostTaxCorpus * r_bond;
+      }
+
       setMfResult({
         corpus: mfFutureValue,
         tax: mfTax,
         postTaxCorpus: mfPostTaxCorpus,
+        yearlyBondIncome,
       });
     } else {
       setMfResult(null);
@@ -138,6 +152,17 @@ const MfVsNpsPage: React.FC = () => {
                 <Label htmlFor="mf-return">Expected MF Return (% p.a.)</Label>
                 <Input id="mf-return" type="number" value={mfInputs.mfReturn} onChange={e => handleMfInputChange('mfReturn', e.target.value)} />
               </div>
+              <Separator />
+              <div className="flex items-center space-x-2 pt-2">
+                <Switch id="mf-transfer-bonds" checked={mfInputs.transferToBonds} onCheckedChange={checked => handleMfInputChange('transferToBonds', checked)} />
+                <Label htmlFor="mf-transfer-bonds">Transfer corpus to Bonds after horizon</Label>
+              </div>
+              {mfInputs.transferToBonds && (
+                <div className="pt-2">
+                  <Label htmlFor="mf-bond-return">Expected Bond Return (% p.a.)</Label>
+                  <Input id="mf-bond-return" type="number" value={mfInputs.bondReturn} onChange={e => handleMfInputChange('bondReturn', e.target.value)} />
+                </div>
+              )}
             </CardContent>
           </Card>
           <Card>
@@ -185,6 +210,15 @@ const MfVsNpsPage: React.FC = () => {
                   <span>Post-Tax Corpus</span>
                   <span>₹{mfResult.postTaxCorpus.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                 </div>
+                {mfResult.yearlyBondIncome !== null && (
+                  <>
+                    <Separator />
+                    <div className="flex justify-between text-lg font-bold pt-2 text-green-600">
+                      <span>Yearly Income from Bonds</span>
+                      <span>₹{mfResult.yearlyBondIncome.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}
