@@ -8,11 +8,15 @@ import { showError, showSuccess } from "@/utils/toast";
 import IncomeField from "@/components/IncomeField";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface Property {
   monthlyRent: number | string;
   monthsRented: number | string;
   propertyTax: number | string;
+  isSelfOccupied: boolean;
 }
 
 const LOCAL_STORAGE_KEY = "dyad-rental-income";
@@ -23,12 +27,15 @@ const RentalIncomePage: React.FC = () => {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Ensure isSelfOccupied exists on loaded data
+          return parsed.map(p => ({ ...p, isSelfOccupied: p.isSelfOccupied || false }));
+        }
       }
     } catch (error) {
       showError("Could not load saved rental data.");
     }
-    return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "" });
+    return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "", isSelfOccupied: false });
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,13 +45,38 @@ const RentalIncomePage: React.FC = () => {
     window.dispatchEvent(new Event('storage')); // Notify dashboard
   }, [properties]);
 
-  const handleInputChange = (index: number, field: keyof Property, value: string) => {
+  const handleInputChange = (index: number, field: keyof Omit<Property, 'isSelfOccupied'>, value: string) => {
     const newProperties = [...properties];
     newProperties[index] = { ...newProperties[index], [field]: value };
     setProperties(newProperties);
   };
 
+  const handleSelfOccupiedToggle = (index: number, checked: boolean) => {
+    const newProperties = [...properties];
+    
+    if (checked) {
+      const selfOccupiedCount = newProperties.filter(p => p.isSelfOccupied).length;
+      if (selfOccupiedCount >= 2) {
+        showError("You can only mark a maximum of two properties as self-occupied.");
+        return;
+      }
+    }
+    
+    newProperties[index].isSelfOccupied = checked;
+    
+    if (checked) {
+      newProperties[index].monthlyRent = "";
+      newProperties[index].monthsRented = "";
+      newProperties[index].propertyTax = "";
+    }
+
+    setProperties(newProperties);
+  };
+
   const calculatePropertyIncome = (property: Property) => {
+    if (property.isSelfOccupied) {
+      return { gav: 0, nav: 0, standardDeduction: 0, taxableIncome: 0 };
+    }
     const gav = (Number(property.monthlyRent) || 0) * (Number(property.monthsRented) || 0);
     const propertyTax = Number(property.propertyTax) || 0;
     const nav = gav - propertyTax;
@@ -78,17 +110,18 @@ const RentalIncomePage: React.FC = () => {
     const processSheetData = (data: any[]) => {
       const parsedData = data
         .map((row: any) => ({
-          monthlyRent: row.monthlyRent || row['Monthly Rent'] || 0,
-          monthsRented: row.monthsRented || row['Months Rented'] || 0,
-          propertyTax: row.propertyTax || row['Property Tax'] || 0,
+          monthlyRent: row.monthlyRent || row['Monthly Rent'] || "",
+          monthsRented: row.monthsRented || row['Months Rented'] || "",
+          propertyTax: row.propertyTax || row['Property Tax'] || "",
+          isSelfOccupied: row.isSelfOccupied || false,
         }))
-        .filter(item => !isNaN(parseFloat(String(item.monthlyRent))) && !isNaN(parseFloat(String(item.monthsRented))));
+        .filter(item => item.monthlyRent !== "" || item.monthsRented !== "" || item.isSelfOccupied);
       
       if (parsedData.length > 0) {
         setProperties(parsedData);
         showSuccess("Rental data imported successfully!");
       } else {
-        showError("No valid rental data found. Please check column names (e.g., monthlyRent, monthsRented, propertyTax).");
+        showError("No valid rental data found. Please check column names (e.g., monthlyRent, monthsRented, propertyTax, isSelfOccupied).");
       }
     };
 
@@ -103,7 +136,8 @@ const RentalIncomePage: React.FC = () => {
           const isValid = (data: any) => Array.isArray(data) && data.every(item => "monthlyRent" in item && "monthsRented" in item && "propertyTax" in item);
 
           if (isValid(importedData.properties)) {
-            setProperties(importedData.properties);
+            const validatedProperties = importedData.properties.map((p: any) => ({...p, isSelfOccupied: p.isSelfOccupied || false}));
+            setProperties(validatedProperties);
             showSuccess("Rental data imported successfully!");
           } else {
             showError("Invalid or empty JSON file format. Expected a 'properties' array.");
@@ -188,9 +222,14 @@ const RentalIncomePage: React.FC = () => {
                   <CardTitle>Property {index + 1}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <IncomeField label="Monthly Rent" id={`monthly-rent-${index}`} value={property.monthlyRent} onChange={(e) => handleInputChange(index, "monthlyRent", e.target.value)} placeholder="e.g. 10000" />
-                  <IncomeField label="No. of Months Rented" id={`months-rented-${index}`} value={property.monthsRented} onChange={(e) => handleInputChange(index, "monthsRented", e.target.value)} placeholder="e.g. 10" max="12" />
-                  <IncomeField label="Property Tax Paid" id={`property-tax-${index}`} value={property.propertyTax} onChange={(e) => handleInputChange(index, "propertyTax", e.target.value)} placeholder="e.g. 5000" />
+                  <div className="flex items-center space-x-2">
+                    <Switch id={`self-occupied-${index}`} checked={property.isSelfOccupied} onCheckedChange={(checked) => handleSelfOccupiedToggle(index, checked)} />
+                    <Label htmlFor={`self-occupied-${index}`}>Self-Occupied Property</Label>
+                  </div>
+                  <Separator />
+                  <IncomeField label="Monthly Rent" id={`monthly-rent-${index}`} value={property.monthlyRent} onChange={(e) => handleInputChange(index, "monthlyRent", e.target.value)} placeholder="e.g. 10000" disabled={property.isSelfOccupied} />
+                  <IncomeField label="No. of Months Rented" id={`months-rented-${index}`} value={property.monthsRented} onChange={(e) => handleInputChange(index, "monthsRented", e.target.value)} placeholder="e.g. 10" max="12" disabled={property.isSelfOccupied} />
+                  <IncomeField label="Property Tax Paid" id={`property-tax-${index}`} value={property.propertyTax} onChange={(e) => handleInputChange(index, "propertyTax", e.target.value)} placeholder="e.g. 5000" disabled={property.isSelfOccupied} />
                   
                   <div className="pt-2 space-y-1 text-sm">
                     <div className="flex justify-between"><span>Gross Annual Value (GAV):</span> <span>₹{gav.toLocaleString("en-IN")}</span></div>
