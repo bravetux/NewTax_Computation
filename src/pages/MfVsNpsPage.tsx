@@ -38,6 +38,8 @@ interface NpsResult {
   lumpSum: number;
   annuityAmount: number;
   monthlyPension: number;
+  lumpSumBondIncomeMonthly: number;
+  totalMonthlyIncome: number;
 }
 
 const MfVsNpsPage: React.FC = () => {
@@ -110,11 +112,18 @@ const MfVsNpsPage: React.FC = () => {
       const npsLumpSum = npsFutureValue * 0.6;
       const npsAnnuityAmount = npsFutureValue * 0.4;
       const monthlyPension = (npsAnnuityAmount * r_annuity) / 12;
+      
+      const bondReturnRate = 0.09; // 9% as requested
+      const lumpSumBondIncomeMonthly = (npsLumpSum * bondReturnRate) / 12;
+      const totalMonthlyIncome = monthlyPension + lumpSumBondIncomeMonthly;
+
       setNpsResult({
         corpus: npsFutureValue,
         lumpSum: npsLumpSum,
         annuityAmount: npsAnnuityAmount,
         monthlyPension: monthlyPension,
+        lumpSumBondIncomeMonthly: lumpSumBondIncomeMonthly,
+        totalMonthlyIncome: totalMonthlyIncome,
       });
     } else {
       setNpsResult(null);
@@ -242,9 +251,12 @@ const MfVsNpsPage: React.FC = () => {
                 <ResultRow label="Tax-Free Lump Sum (60%)" value={`₹${npsResult.lumpSum.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} />
                 <ResultRow label="Annuity Purchase (40%)" value={`₹${npsResult.annuityAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} />
                 <Separator />
+                <ResultRow label="Monthly Pension from Annuity" value={`₹${npsResult.monthlyPension.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} />
+                <ResultRow label="Monthly Income from Lump Sum (Bonds @ 9%)" value={`₹${npsResult.lumpSumBondIncomeMonthly.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`} />
+                <Separator />
                 <div className="flex justify-between text-lg font-bold pt-2">
-                  <span>Monthly Pension</span>
-                  <span>₹{npsResult.monthlyPension.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                  <span>Total Monthly Income</span>
+                  <span>₹{npsResult.totalMonthlyIncome.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                 </div>
               </CardContent>
             </Card>
