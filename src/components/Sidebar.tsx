@@ -20,7 +20,7 @@ import {
   Percent,
   Banknote,
   ListChecks,
-  CalendarClock, // New import for calculator icon
+  CalendarClock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -65,7 +65,7 @@ const Sidebar = () => {
       <div className="p-4 border-b dark:border-gray-700">
         <h2 className="text-2xl font-bold">Tax Planner</h2>
       </div>
-      <nav className="flex-1 px-2 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         <NavLink
           to="/tax-dashboard"
           className={({isActive}) => mainNavLinkClass(isActive)}
