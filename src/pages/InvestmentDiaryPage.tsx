@@ -1,11 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Upload, Download } from 'lucide-react';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { showSuccess, showError } from '@/utils/toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface InvestmentEntry {
   id: string;
@@ -22,10 +33,13 @@ const InvestmentDiaryPage: React.FC = () => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       return saved ? JSON.parse(saved) : [];
-    } catch {
+    } catch (error) {
+      showError("Could not load saved investment diary data.");
       return [];
     }
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
@@ -51,14 +65,111 @@ const InvestmentDiaryPage: React.FC = () => {
     showSuccess('Entry removed.');
   };
 
+  const handleExport = () => {
+    try {
+      const dataToExport = { entries };
+      const dataStr = JSON.stringify(dataToExport, null, 2);
+      const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+      const exportFileDefaultName = "investment-diary.json";
+      
+      const linkElement = document.createElement("a");
+      linkElement.setAttribute("href", dataUri);
+      linkElement.setAttribute("download", exportFileDefaultName);
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      document.body.removeChild(linkElement);
+      
+      showSuccess("Investment diary data exported successfully!");
+    } catch (error) {
+      console.error("Export failed:", error);
+      showError("An error occurred during export.");
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".json")) {
+      showError("Unsupported file type. Please use a .json file.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== "string") {
+          showError("Could not read file content.");
+          return;
+        }
+        
+        const importedData = JSON.parse(text);
+        const isValid = (data: any) => Array.isArray(data) && data.every(item => "id" in item && "date" in item && "name" in item && "assetClass" in item && "amount" in item);
+
+        if (importedData.entries && isValid(importedData.entries)) {
+          setEntries(importedData.entries);
+          showSuccess("Investment diary data imported successfully!");
+        } else {
+          showError("Invalid or empty JSON file format. Expected an 'entries' array with required fields.");
+        }
+      } catch (error) {
+        console.error("Import failed:", error);
+        showError("Failed to parse JSON file. Please ensure it's a valid investment diary backup file.");
+      } finally {
+        if (event.target) {
+          event.target.value = "";
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleClearAllEntries = () => {
+    setEntries([]);
+    showSuccess("All investment diary entries have been cleared.");
+  };
+
   const totalInvestment = entries.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          Investment Diary
-        </h1>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
+            Investment Diary
+          </h1>
+          <div className="flex items-center gap-2">
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
+            <Button variant="outline" onClick={handleImportClick}><Upload className="mr-2 h-4 w-4" /> Import</Button>
+            <Button variant="outline" onClick={handleExport}><Download className="mr-2 h-4 w-4" /> Export</Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete all
+                    your investment diary entries from this browser.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAllEntries}>
+                    Yes, clear all entries
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
         <p className="text-center text-muted-foreground mb-8">
           Keep a log of all your investments in one place.
         </p>
