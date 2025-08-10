@@ -25,6 +25,7 @@ const Sidebar = () => {
   const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(false);
   const [isDividendsOpen, setIsDividendsOpen] = useState(false);
+  const [isTaxSectionsOpen, setIsTaxSectionsOpen] = useState(false);
 
   const mainNavLinkClass = (isActive: boolean) =>
     cn(
@@ -140,6 +141,19 @@ const Sidebar = () => {
           <Gift className="mr-3 h-5 w-5" />
           Gifting
         </NavLink>
+
+        <Collapsible open={isTaxSectionsOpen} onOpenChange={setIsTaxSectionsOpen} className="space-y-1 pt-2">
+          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tax Sections</p>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", isTaxSectionsOpen && "rotate-180")} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1">
+            <NavLink to="/section-54f" className={subNavLinkClass}>
+              <FileText className="mr-3 h-4 w-4" />
+              Section 54F
+            </NavLink>
+          </CollapsibleContent>
+        </Collapsible>
         
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
             <NavLink
