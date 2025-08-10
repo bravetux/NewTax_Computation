@@ -23,6 +23,8 @@ import GiftingPage from "./pages/GiftingPage";
 import Section54FPage from "./pages/Section54FPage";
 import InvestmentDiaryPage from "./pages/InvestmentDiaryPage";
 import MfVsNpsPage from "./pages/MfVsNpsPage";
+import TaxRegimeComparisonPage from "./pages/TaxRegimeComparisonPage";
+import LoanEMICalculatorPage from "./pages/LoanEMICalculatorPage";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +97,14 @@ const App = () => (
             <Route
               path="/mf-vs-nps"
               element={<MfVsNpsPage />}
+            />
+            <Route
+              path="/tax-regime-comparison"
+              element={<TaxRegimeComparisonPage />}
+            />
+            <Route
+              path="/loan-emi-calculator"
+              element={<LoanEMICalculatorPage />}
             />
             <Route
               path="/data-management"

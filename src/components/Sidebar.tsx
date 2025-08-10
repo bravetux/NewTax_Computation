@@ -17,6 +17,8 @@ import {
   Gift,
   BookOpen,
   GitCompare,
+  Percent,
+  Banknote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -171,6 +173,14 @@ const Sidebar = () => {
             <NavLink to="/mf-vs-nps" className={subNavLinkClass}>
               <GitCompare className="mr-3 h-4 w-4" />
               MF vs NPS
+            </NavLink>
+            <NavLink to="/tax-regime-comparison" className={subNavLinkClass}>
+              <Percent className="mr-3 h-4 w-4" />
+              Tax Regime Compare
+            </NavLink>
+            <NavLink to="/loan-emi-calculator" className={subNavLinkClass}>
+              <Banknote className="mr-3 h-4 w-4" />
+              Loan EMI Calculator
             </NavLink>
           </CollapsibleContent>
         </Collapsible>
