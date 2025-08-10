@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { MadeWithDyad } from '@/components/made-with-dyad';
-import { Calculator, Info } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Section54FPage: React.FC = () => {
@@ -29,11 +29,9 @@ const Section54FPage: React.FC = () => {
       return;
     }
 
-    // If cost of new house is >= net consideration, entire capital gain is exempt.
     if (newHouseCost >= netConsideration) {
       setExemption(gains);
     } else {
-      // Otherwise, exemption is proportionate.
       const calculatedExemption = (gains * newHouseCost) / netConsideration;
       setExemption(Math.min(gains, calculatedExemption));
     }
@@ -55,26 +53,67 @@ const Section54FPage: React.FC = () => {
           Calculate tax exemption on long-term capital gains from the sale of any asset (other than a residential house) by investing the proceeds in a new residential house.
         </p>
 
-        <Alert className="mb-8">
-          <Info className="h-4 w-4" />
-          <AlertTitle>Example Calculation</AlertTitle>
-          <AlertDescription>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-              <li>You sell shares with a net consideration of <strong>₹50 lakh</strong>.</li>
-              <li>Your Long-Term Capital Gains (LTCG) from this sale are <strong>₹30 lakh</strong>.</li>
-              <li>You invest in a new house costing <strong>₹40 lakh</strong>.</li>
-            </ul>
-            <p className="mt-3 text-sm">
-              The exemption is calculated proportionately:
-            </p>
-            <p className="font-mono bg-muted p-2 rounded-md mt-1 text-sm">
-              (₹30,00,000 × ₹40,00,000) / ₹50,00,000 = <strong>₹24,00,000</strong>
-            </p>
-            <p className="mt-3 text-sm">
-              Your taxable LTCG is ₹30,00,000 - ₹24,00,000 = <strong>₹6,00,000</strong>. This amount will be taxed at the applicable rate (e.g., 10% + cess).
-            </p>
-          </AlertDescription>
-        </Alert>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Understanding Section 54F</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div>
+              <h4 className="font-semibold text-base mb-1">Applies to:</h4>
+              <p className="text-muted-foreground">LTCG from the sale of any long-term capital asset other than a residential house — this includes stocks, mutual funds, gold, land, etc.</p>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-base mb-1">Who can use:</h4>
+              <p className="text-muted-foreground">Individuals and HUFs (not companies).</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-base mb-1">Time limit for investment:</h4>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1 pl-4">
+                <li><strong>Purchase:</strong> within 1 year before or 2 years after the date of sale.</li>
+                <li><strong>Construction:</strong> within 3 years after the date of sale.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-base mb-1">Key conditions:</h4>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1 pl-4">
+                <li>On the date of sale, you must not own more than one residential house (other than the new one).</li>
+                <li>You cannot buy another residential house within 2 years or construct one within 3 years.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-base mb-1">Exemption amount:</h4>
+              <p className="text-muted-foreground">If you invest the entire net sale consideration, the entire LTCG is exempt. Otherwise, the exemption is calculated proportionately:</p>
+              <p className="font-mono bg-muted p-2 rounded-md my-2 text-center">Exemption = (LTCG × Cost of new house) / Net sale consideration</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-base mb-1">Capital Gains Account Scheme (CGAS):</h4>
+              <p className="text-muted-foreground">If you don’t invest the amount before the ITR filing due date, you must deposit it in a CGAS account to claim the exemption.</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-base mb-1">Example:</h4>
+              <div className="p-3 rounded-md border bg-background/50">
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>You sell shares for a <strong>net consideration of ₹50 lakh</strong>.</li>
+                  <li>Your Long-Term Capital Gains (LTCG) are <strong>₹30 lakh</strong>.</li>
+                  <li>You buy a new house for <strong>₹40 lakh</strong>.</li>
+                </ul>
+                <p className="mt-3 text-muted-foreground">The exemption is calculated as:</p>
+                <p className="font-mono bg-muted p-2 rounded-md mt-1 text-center">
+                  (₹30,00,000 × ₹40,00,000) / ₹50,00,000 = <strong>₹24,00,000</strong>
+                </p>
+                <p className="mt-3 text-muted-foreground">
+                  Your taxable LTCG is ₹30,00,000 - ₹24,00,000 = <strong>₹6,00,000</strong>.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
