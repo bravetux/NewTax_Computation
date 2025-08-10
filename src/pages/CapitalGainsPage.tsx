@@ -77,7 +77,7 @@ const CapitalGainsPage: React.FC = () => {
             <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <AlertTitle className="text-blue-800 dark:text-blue-300">Tax Planning Opportunity</AlertTitle>
             <AlertDescription className="text-blue-700 dark:text-blue-400">
-              Your Long-Term Capital Gains exceed the ₹1,25,000 exemption. Consider gifting stocks to your spouse, parents, or children (age >= 18) to utilize their individual exemption limits and reduce overall tax.
+              Your Long-Term Capital Gains exceed the ₹1,25,000 exemption. Consider gifting stocks to your spouse, parents, or children (age {'>='} 18) to utilize their individual exemption limits and reduce overall tax.
             </AlertDescription>
           </Alert>
         )}
