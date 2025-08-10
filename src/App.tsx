@@ -25,6 +25,7 @@ import InvestmentDiaryPage from "./pages/InvestmentDiaryPage";
 import MfVsNpsPage from "./pages/MfVsNpsPage";
 import TaxRegimeComparisonPage from "./pages/TaxRegimeComparisonPage";
 import LoanEMICalculatorPage from "./pages/LoanEMICalculatorPage";
+import TaxFilingChecklistPage from "./pages/TaxFilingChecklistPage"; // New import
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,10 @@ const App = () => (
             <Route
               path="/loan-emi-calculator"
               element={<LoanEMICalculatorPage />}
+            />
+            <Route
+              path="/tax-filing-checklist" // New Route
+              element={<TaxFilingChecklistPage />}
             />
             <Route
               path="/data-management"

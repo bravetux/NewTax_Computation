@@ -19,6 +19,7 @@ import {
   GitCompare,
   Percent,
   Banknote,
+  ListChecks, // New import for checklist icon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -181,6 +182,10 @@ const Sidebar = () => {
             <NavLink to="/loan-emi-calculator" className={subNavLinkClass}>
               <Banknote className="mr-3 h-4 w-4" />
               Loan EMI Calculator
+            </NavLink>
+            <NavLink to="/tax-filing-checklist" className={subNavLinkClass}>
+              <ListChecks className="mr-3 h-4 w-4" />
+              Tax Filing Checklist
             </NavLink>
           </CollapsibleContent>
         </Collapsible>
