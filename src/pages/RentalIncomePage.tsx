@@ -35,7 +35,7 @@ const RentalIncomePage: React.FC = () => {
     } catch (error) {
       showError("Could not load saved rental data.");
     }
-    return Array(5).fill({ monthlyRent: "", monthsRented: "", propertyTax: "", isSelfOccupied: false });
+    return Array(8).fill({ monthlyRent: "", monthsRented: "", propertyTax: "", isSelfOccupied: false });
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -234,7 +234,7 @@ const RentalIncomePage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           {properties.map((property, index) => {
             const { gav, nav, standardDeduction, taxableIncome } = calculatePropertyIncome(property);
             return (
