@@ -72,10 +72,10 @@ const AdvanceTaxComputationPage: React.FC = () => {
     
     const slabTax = calculateNewRegimeSlabTax(taxableSlabIncome);
     
-    // Standard equity capital gains tax rates
-    const stcgTax = stcg * 0.15;
-    const taxableLtcg = Math.max(0, ltcg - 100000);
-    const ltcgTax = taxableLtcg * 0.10;
+    // Updated capital gains tax rates as per user request
+    const stcgTax = stcg * 0.20;
+    const taxableLtcg = Math.max(0, ltcg - 125000);
+    const ltcgTax = taxableLtcg * 0.125;
     
     const totalTaxBeforeCess = slabTax + stcgTax + ltcgTax;
     const cess = totalTaxBeforeCess * 0.04;
@@ -154,11 +154,11 @@ const AdvanceTaxComputationPage: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="stcg-income">Short-Term Capital Gains (Equity)</Label>
-                <Input id="stcg-income" type="number" value={stcgIncome} onChange={(e) => setStcgIncome(e.target.value)} placeholder="Taxed at 15%" />
+                <Input id="stcg-income" type="number" value={stcgIncome} onChange={(e) => setStcgIncome(e.target.value)} placeholder="Taxed at 20%" />
               </div>
               <div>
                 <Label htmlFor="ltcg-income">Long-Term Capital Gains (Equity)</Label>
-                <Input id="ltcg-income" type="number" value={ltcgIncome} onChange={(e) => setLtcgIncome(e.target.value)} placeholder="Taxed at 10% over 1 Lakh" />
+                <Input id="ltcg-income" type="number" value={ltcgIncome} onChange={(e) => setLtcgIncome(e.target.value)} placeholder="Taxed at 12.5% over 1.25 Lakh" />
               </div>
               <Separator />
               <div>
@@ -182,8 +182,8 @@ const AdvanceTaxComputationPage: React.FC = () => {
                   <BreakdownRow label="Taxable Slab Income" value={result.breakdown.taxableSlabIncome} className="font-medium" />
                   <BreakdownRow label="Tax on Slab Income" value={result.breakdown.slabTax} />
                   <Separator />
-                  <BreakdownRow label="Tax on STCG @ 15%" value={result.breakdown.stcgTax} />
-                  <BreakdownRow label="Tax on LTCG @ 10%" value={result.breakdown.ltcgTax} />
+                  <BreakdownRow label="Tax on STCG @ 20%" value={result.breakdown.stcgTax} />
+                  <BreakdownRow label="Tax on LTCG @ 12.5%" value={result.breakdown.ltcgTax} />
                   <Separator />
                   <BreakdownRow label="Total Tax before Cess" value={result.breakdown.totalTaxBeforeCess} className="font-medium" />
                   <BreakdownRow label="Health & Edu Cess @ 4%" value={result.breakdown.cess} />
