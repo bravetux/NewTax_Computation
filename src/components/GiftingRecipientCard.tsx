@@ -128,41 +128,25 @@ const GiftingRecipientCard: React.FC<GiftingRecipientCardProps> = ({
                 </AlertDescription>
               </Alert>
             )}
+            {taxDetails.stclSetOff > 0 && (
+              <Alert variant="default" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700">
+                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertTitle className="text-blue-800 dark:text-blue-300">Loss Set-Off Applied</AlertTitle>
+                <AlertDescription className="text-blue-700 dark:text-blue-400">
+                  A short-term loss of ₹{taxDetails.stclSetOff.toLocaleString("en-IN")} has been set off against long-term gains.
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="p-2 rounded-md bg-muted/50 space-y-2">
-              <Label className="font-semibold">Income Tax (Slab Regime)</Label>
-              <BreakdownRow label="Gross Slab Income" value={taxDetails.grossSlabIncome} />
-              <BreakdownRow label="Standard Deduction" value={taxDetails.standardDeduction} isNegative />
-              <Separator className="my-1" />
-              <BreakdownRow label="Net Taxable Income" value={taxDetails.netTaxableSlabIncome} className="font-medium" />
-              <BreakdownRow label="Tax on Income" value={taxDetails.slabTaxBeforeRebate} />
+              <BreakdownRow label="Net Taxable Slab Income" value={taxDetails.netTaxableSlabIncome} />
+              <BreakdownRow label="Tax on Slab Income" value={taxDetails.slabTaxBeforeRebate} />
+              <Separator />
+              <BreakdownRow label="Tax on Capital Gains" value={taxDetails.totalCapitalGainsTax} />
+              <Separator />
+              <BreakdownRow label="Total Tax (before surcharge)" value={taxDetails.totalTaxBeforeSurcharge} className="font-medium" />
               <BreakdownRow label="Surcharge" value={taxDetails.surcharge} />
               <BreakdownRow label="Cess (4%)" value={taxDetails.cess} />
-              <Separator className="my-1" />
-              <BreakdownRow label="Total Income Tax" value={taxDetails.totalIncomeTax} className="font-bold" />
-            </div>
-
-            <div className="p-2 rounded-md bg-muted/50 space-y-2">
-              <Label className="font-semibold">Capital Gains Tax</Label>
-              {taxDetails.stclSetOff > 0 && (
-                <Alert variant="default" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700">
-                  <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <AlertTitle className="text-blue-800 dark:text-blue-300">Loss Set-Off Applied</AlertTitle>
-                  <AlertDescription className="text-blue-700 dark:text-blue-400">
-                    A short-term loss of ₹{taxDetails.stclSetOff.toLocaleString("en-IN")} has been set off against long-term gains.
-                  </AlertDescription>
-                </Alert>
-              )}
-              <BreakdownRow label="LTCG" value={Math.max(0, taxDetails.postSetOffLtcg)} />
-              <BreakdownRow label="Exemption" value={taxDetails.ltcgExemption} isNegative />
-              <Separator className="my-1" />
-              <BreakdownRow label="Taxable LTCG" value={taxDetails.taxableLtcg} />
-              <BreakdownRow label="Tax on LTCG @ 12.5%" value={taxDetails.ltcgTax} />
-              <Separator className="my-1" />
-              <BreakdownRow label="Taxable STCG" value={Math.max(0, taxDetails.postSetOffStcg)} />
-              <BreakdownRow label="Tax on STCG @ 20%" value={taxDetails.stcgTax} />
-              <Separator className="my-1" />
-              <BreakdownRow label="Total Capital Gains Tax" value={taxDetails.totalCapitalGainsTax} className="font-bold" />
             </div>
 
             <div className="text-lg font-bold p-2 bg-primary/10 dark:bg-primary/20 rounded-md text-center flex justify-between items-center">

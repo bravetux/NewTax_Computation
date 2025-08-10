@@ -102,31 +102,7 @@ const TaxComputationPage: React.FC = () => {
 
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>1. Income Tax (Slab Regime)</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              {taxDetails.isRebateApplicable && (
-                <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 mb-4">
-                  <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
-                  <AlertDescription className="text-green-700 dark:text-green-400">
-                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero.
-                  </AlertDescription>
-                </Alert>
-              )}
-              <BreakdownRow label="Gross Income (excl. Capital Gains)" value={taxDetails.grossSlabIncome} />
-              <BreakdownRow label="Standard Deduction" value={taxDetails.standardDeduction} isNegative />
-              <Separator />
-              <BreakdownRow label="Net Taxable Income" value={taxDetails.netTaxableSlabIncome} className="font-medium" />
-              <BreakdownRow label="Tax on Income" value={taxDetails.slabTaxBeforeRebate} />
-              <BreakdownRow label="Surcharge" value={taxDetails.surcharge} />
-              <BreakdownRow label="Cess (4%)" value={taxDetails.cess} />
-              <Separator />
-              <BreakdownRow label="Total Income Tax" value={taxDetails.totalIncomeTax} className="font-bold text-base" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>2. Capital Gains Tax</CardTitle></CardHeader>
+            <CardHeader><CardTitle>1. Capital Gains Tax Breakdown</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {taxDetails.stclSetOff > 0 && (
                   <Alert variant="default" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 mb-4">
@@ -148,12 +124,37 @@ const TaxComputationPage: React.FC = () => {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader><CardTitle>2. Income Tax & Final Calculation</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {taxDetails.isRebateApplicable && (
+                <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 mb-4">
+                  <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
+                  <AlertDescription className="text-green-700 dark:text-green-400">
+                    Your taxable income is ₹12,00,000 or less, so your income tax liability on slab income is zero.
+                  </AlertDescription>
+                </Alert>
+              )}
+              <BreakdownRow label="Gross Income (excl. Capital Gains)" value={taxDetails.grossSlabIncome} />
+              <BreakdownRow label="Standard Deduction" value={taxDetails.standardDeduction} isNegative />
+              <Separator />
+              <BreakdownRow label="Net Taxable Slab Income" value={taxDetails.netTaxableSlabIncome} className="font-medium" />
+              <Separator />
+              <BreakdownRow label="Tax on Slab Income" value={taxDetails.slabTaxBeforeRebate} />
+              <BreakdownRow label="Tax on Capital Gains" value={taxDetails.totalCapitalGainsTax} />
+              <Separator />
+              <BreakdownRow label="Total Tax (before surcharge)" value={taxDetails.totalTaxBeforeSurcharge} className="font-medium" />
+              <BreakdownRow label="Surcharge" value={taxDetails.surcharge} />
+              <BreakdownRow label="Cess (4%)" value={taxDetails.cess} />
+              <Separator />
+              <BreakdownRow label="Total Tax Payable" value={taxDetails.totalTaxPayable} className="font-bold text-base" />
+            </CardContent>
+          </Card>
+
           <Card className="bg-primary/5 dark:bg-primary/10">
             <CardHeader><CardTitle>3. Final Tax Liability</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              <BreakdownRow label="Total Income Tax" value={taxDetails.totalIncomeTax} className="text-base" />
-              <BreakdownRow label="Total Capital Gains Tax" value={taxDetails.totalCapitalGainsTax} className="text-base" />
-              <Separator />
+            <CardContent>
               <div className="flex justify-between text-xl font-bold pt-2">
                 <span>Total Tax Payable</span>
                 <span className="font-mono">₹{taxDetails.totalTaxPayable.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>

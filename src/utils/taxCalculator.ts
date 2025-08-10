@@ -20,10 +20,6 @@ export interface TaxCalculationResult {
   netTaxableSlabIncome: number;
   isRebateApplicable: boolean;
   slabTaxBeforeRebate: number;
-  surcharge: number;
-  taxBeforeCess: number;
-  cess: number;
-  totalIncomeTax: number;
 
   // Capital Gains Tax Calculation
   stclSetOff: number;
@@ -35,7 +31,10 @@ export interface TaxCalculationResult {
   stcgTax: number;
   totalCapitalGainsTax: number;
 
-  // Final
+  // Combined Final Calculation
+  totalTaxBeforeSurcharge: number;
+  surcharge: number;
+  cess: number;
   totalTaxPayable: number;
 }
 
@@ -58,11 +57,6 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
     if (netTaxableSlabIncome > 2400000) slabTaxBeforeRebate += (netTaxableSlabIncome - 2400000) * 0.30;
   }
   
-  const surcharge = netTaxableSlabIncome > 5000000 ? slabTaxBeforeRebate * 0.10 : 0;
-  const taxBeforeCess = slabTaxBeforeRebate + surcharge;
-  const cess = taxBeforeCess * 0.04;
-  const totalIncomeTax = taxBeforeCess + cess;
-
   // 2. Handle Capital Gains, including loss set-off
   const { stcg: originalStcg, ltcg: originalLtcg } = details;
   let stclSetOff = 0;
@@ -84,8 +78,18 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
   const stcgTax = stcgForTax * 0.20;
   const totalCapitalGainsTax = ltcgTax + stcgTax;
 
-  // 3. Total tax payable
-  const totalTaxPayable = totalIncomeTax + totalCapitalGainsTax;
+  // 3. Combined final calculation
+  const totalTaxBeforeSurcharge = slabTaxBeforeRebate + totalCapitalGainsTax;
+  
+  const totalIncomeForSurcharge = netTaxableSlabIncome + stcgForTax + ltcgForTax;
+  let surcharge = 0;
+  if (totalIncomeForSurcharge > 5000000) {
+    surcharge = totalTaxBeforeSurcharge * 0.10;
+  }
+
+  const taxBeforeCess = totalTaxBeforeSurcharge + surcharge;
+  const cess = taxBeforeCess * 0.04;
+  const totalTaxPayable = taxBeforeCess + cess;
 
   return {
     grossSlabIncome,
@@ -95,10 +99,6 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
     netTaxableSlabIncome,
     isRebateApplicable,
     slabTaxBeforeRebate,
-    surcharge,
-    taxBeforeCess,
-    cess,
-    totalIncomeTax,
     stclSetOff,
     postSetOffStcg,
     postSetOffLtcg,
@@ -107,6 +107,9 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
     ltcgTax,
     stcgTax,
     totalCapitalGainsTax,
+    totalTaxBeforeSurcharge,
+    surcharge,
+    cess,
     totalTaxPayable,
   };
 };
