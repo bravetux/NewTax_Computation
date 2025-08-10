@@ -19,7 +19,8 @@ import {
   GitCompare,
   Percent,
   Banknote,
-  ListChecks, // New import for checklist icon
+  ListChecks,
+  CalendarClock, // New import for calculator icon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -186,6 +187,10 @@ const Sidebar = () => {
             <NavLink to="/tax-filing-checklist" className={subNavLinkClass}>
               <ListChecks className="mr-3 h-4 w-4" />
               Tax Filing Checklist
+            </NavLink>
+            <NavLink to="/advance-tax-computation" className={subNavLinkClass}>
+              <CalendarClock className="mr-3 h-4 w-4" />
+              Advance Tax Calculator
             </NavLink>
           </CollapsibleContent>
         </Collapsible>
