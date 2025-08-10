@@ -95,12 +95,12 @@ const TaxComputationPage: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
           Tax Computation (New Regime)
         </h1>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <Card>
             <CardHeader><CardTitle>1. Capital Gains Tax Breakdown</CardTitle></CardHeader>
             <CardContent className="space-y-2">
@@ -125,7 +125,7 @@ const TaxComputationPage: React.FC = () => {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle>2. Income Tax & Final Calculation</CardTitle></CardHeader>
+            <CardHeader><CardTitle>2. Income Tax Calculation</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {taxDetails.isRebateApplicable && (
                 <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 mb-4">
@@ -141,27 +141,32 @@ const TaxComputationPage: React.FC = () => {
               <Separator />
               <BreakdownRow label="Net Taxable Slab Income" value={taxDetails.netTaxableSlabIncome} className="font-medium" />
               <Separator />
+              <BreakdownRow label="Tax on Slab Income" value={taxDetails.slabTaxBeforeRebate} className="font-bold text-base" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="mb-6">
+            <CardHeader><CardTitle>3. Final Tax Calculation</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
               <BreakdownRow label="Tax on Slab Income" value={taxDetails.slabTaxBeforeRebate} />
               <BreakdownRow label="Tax on Capital Gains" value={taxDetails.totalCapitalGainsTax} />
               <Separator />
               <BreakdownRow label="Total Tax (before surcharge)" value={taxDetails.totalTaxBeforeSurcharge} className="font-medium" />
               <BreakdownRow label="Surcharge" value={taxDetails.surcharge} />
               <BreakdownRow label="Cess (4%)" value={taxDetails.cess} />
-              <Separator />
-              <BreakdownRow label="Total Tax Payable" value={taxDetails.totalTaxPayable} className="font-bold text-base" />
             </CardContent>
-          </Card>
+        </Card>
 
-          <Card className="bg-primary/5 dark:bg-primary/10">
-            <CardHeader><CardTitle>3. Final Tax Liability</CardTitle></CardHeader>
-            <CardContent>
-              <div className="flex justify-between text-xl font-bold pt-2">
-                <span>Total Tax Payable</span>
-                <span className="font-mono">₹{taxDetails.totalTaxPayable.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="bg-primary/5 dark:bg-primary/10">
+          <CardHeader><CardTitle>4. Final Tax Liability</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex justify-between text-xl font-bold pt-2">
+              <span>Total Tax Payable</span>
+              <span className="font-mono">₹{taxDetails.totalTaxPayable.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       <MadeWithDyad />
     </div>
