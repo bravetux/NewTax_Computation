@@ -24,18 +24,33 @@ const LOCAL_STORAGE_KEY = "dyad-rental-income";
 
 const RentalIncomePage: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>(() => {
+    const MIN_CARDS = 8;
+    let loadedProperties: Property[] = [];
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map(p => ({ ...p, isSelfOccupied: p.isSelfOccupied || false }));
+        if (Array.isArray(parsed)) {
+          loadedProperties = parsed.map(p => ({ 
+              monthlyRent: p.monthlyRent || "", 
+              monthsRented: p.monthsRented || "", 
+              propertyTax: p.propertyTax || "", 
+              isSelfOccupied: p.isSelfOccupied || false 
+          }));
         }
       }
     } catch (error) {
       showError("Could not load saved rental data.");
     }
-    return Array(8).fill({ monthlyRent: "", monthsRented: "", propertyTax: "", isSelfOccupied: false });
+
+    const currentCount = loadedProperties.length;
+    if (currentCount < MIN_CARDS) {
+      const emptyProperty = { monthlyRent: "", monthsRented: "", propertyTax: "", isSelfOccupied: false };
+      const additionalProperties = Array(MIN_CARDS - currentCount).fill(emptyProperty);
+      return [...loadedProperties, ...additionalProperties];
+    }
+
+    return loadedProperties;
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
