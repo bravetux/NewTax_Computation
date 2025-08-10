@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface CapitalGainsItem {
   name: string;
@@ -70,6 +71,16 @@ const CapitalGainsPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
           Capital Gains Summary
         </h1>
+
+        {totalLtcg > ltcgExemption && (
+          <Alert className="mb-8 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertTitle className="text-blue-800 dark:text-blue-300">Tax Planning Opportunity</AlertTitle>
+            <AlertDescription className="text-blue-700 dark:text-blue-400">
+              Your Long-Term Capital Gains exceed the ₹1,25,000 exemption. Consider gifting stocks to your spouse, parents, or children (age >= 18) to utilize their individual exemption limits and reduce overall tax.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card>
