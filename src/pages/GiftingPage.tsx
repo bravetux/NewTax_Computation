@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import GiftingRecipientCard from '@/components/GiftingRecipientCard';
 import { calculateTax, DetailedIncome, TaxCalculationResult } from '@/utils/taxCalculator';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ChevronDown, Trash2, RotateCcw } from 'lucide-react';
 
 interface Recipient {
   age: number | string;
@@ -17,6 +20,18 @@ interface Recipient {
 
 const LOCAL_STORAGE_KEY = "dyad-gifting-recipients-data";
 
+const initialRecipientState: Recipient = {
+  age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null
+};
+
+const initialRecipientsState = {
+  spouse: { ...initialRecipientState },
+  mother: { ...initialRecipientState },
+  father: { ...initialRecipientState },
+  kid1: { ...initialRecipientState },
+  kid2: { ...initialRecipientState },
+};
+
 const GiftingPage: React.FC = () => {
   const [recipients, setRecipients] = useState<Record<string, Recipient>>(() => {
     try {
@@ -30,13 +45,7 @@ const GiftingPage: React.FC = () => {
     } catch (error) {
       console.error("Failed to load gifting data from localStorage", error);
     }
-    return {
-      spouse: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-      mother: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-      father: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-      kid1: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-      kid2: { age: '', salary: '', isSalaried: false, fdIncome: '', bondIncome: '', dividendIncome: '', stcg: '', ltcg: '', taxDetails: null },
-    };
+    return initialRecipientsState;
   });
 
   useEffect(() => {
@@ -92,12 +101,52 @@ const GiftingPage: React.FC = () => {
     }));
   };
 
+  const handleClearCard = (recipientKey: keyof typeof recipients) => {
+    setRecipients(prev => ({
+      ...prev,
+      [recipientKey]: { ...initialRecipientState }
+    }));
+  };
+
+  const handleClearAllCards = () => {
+    setRecipients(initialRecipientsState);
+  };
+
+  const handleResetAllComputations = () => {
+    setRecipients(prev => {
+      const newState = { ...prev };
+      for (const key in newState) {
+        newState[key].taxDetails = null;
+      }
+      return newState;
+    });
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
-          Gifting & Tax Planner
-        </h1>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50">
+            Gifting & Tax Planner
+          </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Actions <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={handleClearAllCards}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Clear All Fields</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleResetAllComputations}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                <span>Reset All Tax Computations</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
           Enter the income details for your family members to compute their individual tax liability under the new tax regime.
         </p>
@@ -129,6 +178,7 @@ const GiftingPage: React.FC = () => {
 
               taxDetails={recipient.taxDetails}
               onComputeTax={() => handleComputeTax(key as keyof typeof recipients)}
+              onClearFields={() => handleClearCard(key as keyof typeof recipients)}
             />
           ))}
         </div>

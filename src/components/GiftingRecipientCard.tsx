@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Calculator, Info } from 'lucide-react';
+import { Calculator, Info, Trash2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { TaxCalculationResult } from '@/utils/taxCalculator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -33,6 +33,7 @@ interface GiftingRecipientCardProps {
 
   taxDetails: TaxCalculationResult | null;
   onComputeTax: () => void;
+  onClearFields: () => void;
 }
 
 const BreakdownRow: React.FC<{ label: string; value: number; isNegative?: boolean; className?: string }> = ({ label, value, isNegative = false, className = "" }) => (
@@ -53,11 +54,15 @@ const GiftingRecipientCard: React.FC<GiftingRecipientCardProps> = ({
   stcg, onStcgChange,
   ltcg, onLtcgChange,
   taxDetails, onComputeTax,
+  onClearFields,
 }) => {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{name}</CardTitle>
+        <Button variant="ghost" size="icon" onClick={onClearFields}>
+          <Trash2 className="h-4 w-4 text-muted-foreground" />
+        </Button>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
