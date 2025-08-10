@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { MadeWithDyad } from '@/components/made-with-dyad';
-import { Calculator } from 'lucide-react';
+import { Calculator, Info } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Section54FPage: React.FC = () => {
@@ -55,6 +55,27 @@ const Section54FPage: React.FC = () => {
           Calculate tax exemption on long-term capital gains from the sale of any asset (other than a residential house) by investing the proceeds in a new residential house.
         </p>
 
+        <Alert className="mb-8">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Example Calculation</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+              <li>You sell shares with a net consideration of <strong>₹50 lakh</strong>.</li>
+              <li>Your Long-Term Capital Gains (LTCG) from this sale are <strong>₹30 lakh</strong>.</li>
+              <li>You invest in a new house costing <strong>₹40 lakh</strong>.</li>
+            </ul>
+            <p className="mt-3 text-sm">
+              The exemption is calculated proportionately:
+            </p>
+            <p className="font-mono bg-muted p-2 rounded-md mt-1 text-sm">
+              (₹30,00,000 × ₹40,00,000) / ₹50,00,000 = <strong>₹24,00,000</strong>
+            </p>
+            <p className="mt-3 text-sm">
+              Your taxable LTCG is ₹30,00,000 - ₹24,00,000 = <strong>₹6,00,000</strong>. This amount will be taxed at the applicable rate (e.g., 10% + cess).
+            </p>
+          </AlertDescription>
+        </Alert>
+
         <Card>
           <CardHeader>
             <CardTitle>Enter Details</CardTitle>
@@ -62,15 +83,15 @@ const Section54FPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="capital-gains">Long-Term Capital Gains (LTCG)</Label>
-              <Input id="capital-gains" type="number" value={capitalGains} onChange={(e) => setCapitalGains(e.target.value)} placeholder="e.g., 5000000" />
+              <Input id="capital-gains" type="number" value={capitalGains} onChange={(e) => setCapitalGains(e.target.value)} placeholder="e.g., 3000000" />
             </div>
             <div>
               <Label htmlFor="sale-consideration">Full Sale Value of Asset</Label>
-              <Input id="sale-consideration" type="number" value={saleConsideration} onChange={(e) => setSaleConsideration(e.target.value)} placeholder="e.g., 10000000" />
+              <Input id="sale-consideration" type="number" value={saleConsideration} onChange={(e) => setSaleConsideration(e.target.value)} placeholder="e.g., 5000000" />
             </div>
             <div>
               <Label htmlFor="transfer-expenses">Expenses on Transfer</Label>
-              <Input id="transfer-expenses" type="number" value={transferExpenses} onChange={(e) => setTransferExpenses(e.target.value)} placeholder="e.g., 100000" />
+              <Input id="transfer-expenses" type="number" value={transferExpenses} onChange={(e) => setTransferExpenses(e.target.value)} placeholder="e.g., 0" />
             </div>
             <div className="p-2 rounded-md bg-muted/50">
               <div className="flex justify-between text-sm font-medium">
@@ -80,7 +101,7 @@ const Section54FPage: React.FC = () => {
             </div>
             <div>
               <Label htmlFor="cost-new-house">Cost of New Residential House</Label>
-              <Input id="cost-new-house" type="number" value={costOfNewHouse} onChange={(e) => setCostOfNewHouse(e.target.value)} placeholder="e.g., 8000000" />
+              <Input id="cost-new-house" type="number" value={costOfNewHouse} onChange={(e) => setCostOfNewHouse(e.target.value)} placeholder="e.g., 4000000" />
             </div>
             <Button onClick={handleCalculate} className="w-full">
               <Calculator className="mr-2 h-4 w-4" /> Calculate Exemption
