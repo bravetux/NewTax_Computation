@@ -158,6 +158,10 @@ const FDIncomePage: React.FC = () => {
           </div>
         </div>
 
+        <p className="text-center text-muted-foreground mb-8 max-w-3xl mx-auto">
+          Maintain only your emergency fund—up to ₹5 lakh—in fixed deposits. If your FD interest is attracting high taxes, consider reallocating the excess to an arbitrage fund to reduce tax liability while targeting ~7% returns with capital preservation. For those with higher risk appetite, shifting part of the funds to Nifty 50 or Nifty Next 50 index funds can offer the potential for superior long-term growth.
+        </p>
+
         <Card className="mb-8">
           <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
