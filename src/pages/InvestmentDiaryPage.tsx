@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Textarea } from '@/components/ui/textarea'; // Import Textarea
 
 interface InvestmentEntry {
   id: string;
@@ -24,6 +25,7 @@ interface InvestmentEntry {
   name: string;
   assetClass: string;
   amount: number | string;
+  note: string; // Added note field
 }
 
 const LOCAL_STORAGE_KEY = 'dyad-investment-diary';
@@ -32,11 +34,18 @@ const InvestmentDiaryPage: React.FC = () => {
   const [entries, setEntries] = useState<InvestmentEntry[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure 'note' field is present when loading old data
+        return parsed.map((entry: InvestmentEntry) => ({
+          ...entry,
+          note: entry.note || '', // Initialize note if it doesn't exist
+        }));
+      }
     } catch (error) {
       showError("Could not load saved investment diary data.");
-      return [];
     }
+    return [];
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +57,7 @@ const InvestmentDiaryPage: React.FC = () => {
   const handleAddRow = () => {
     setEntries([
       ...entries,
-      { id: new Date().toISOString(), date: '', name: '', assetClass: '', amount: '' },
+      { id: new Date().toISOString(), date: '', name: '', assetClass: '', amount: '', note: '' }, // Initialize new entry with note
     ]);
   };
 
@@ -110,10 +119,17 @@ const InvestmentDiaryPage: React.FC = () => {
         }
         
         const importedData = JSON.parse(text);
-        const isValid = (data: any) => Array.isArray(data) && data.every(item => "id" in item && "date" in item && "name" in item && "assetClass" in item && "amount" in item);
+        // Validate imported data and ensure 'note' field is handled
+        const isValid = (data: any) => Array.isArray(data) && data.every(item => 
+          "id" in item && "date" in item && "name" in item && "assetClass" in item && "amount" in item
+        );
 
         if (importedData.entries && isValid(importedData.entries)) {
-          setEntries(importedData.entries);
+          const validatedEntries = importedData.entries.map((entry: InvestmentEntry) => ({
+            ...entry,
+            note: entry.note || '', // Ensure note is initialized
+          }));
+          setEntries(validatedEntries);
           showSuccess("Investment diary data imported successfully!");
         } else {
           showError("Invalid or empty JSON file format. Expected an 'entries' array with required fields.");
@@ -201,6 +217,7 @@ const InvestmentDiaryPage: React.FC = () => {
                     <TableHead>Investment Name</TableHead>
                     <TableHead>Asset Class</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Note</TableHead> {/* Added Note Header */}
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -242,6 +259,14 @@ const InvestmentDiaryPage: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell>
+                          <Textarea
+                            value={entry.note}
+                            onChange={e => handleInputChange(entry.id, 'note', e.target.value)}
+                            placeholder="Add details here..."
+                            className="min-w-[250px] h-auto" // Adjusted height for textarea
+                          />
+                        </TableCell>
+                        <TableCell>
                           <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -250,7 +275,7 @@ const InvestmentDiaryPage: React.FC = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">
+                      <TableCell colSpan={6} className="text-center h-24"> {/* Updated colspan */}
                         No entries yet. Click "Add Entry" to start.
                       </TableCell>
                     </TableRow>
