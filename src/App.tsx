@@ -21,6 +21,8 @@ import DataManagementPage from "./pages/DataManagementPage";
 import PlanWithAiPage from "./pages/PlanWithAiPage";
 import GiftingPage from "./pages/GiftingPage";
 import Section54FPage from "./pages/Section54FPage";
+import InvestmentDiaryPage from "./pages/InvestmentDiaryPage";
+import MfVsNpsPage from "./pages/MfVsNpsPage";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +87,14 @@ const App = () => (
             <Route
               path="/section-54f"
               element={<Section54FPage />}
+            />
+            <Route
+              path="/investment-diary"
+              element={<InvestmentDiaryPage />}
+            />
+            <Route
+              path="/mf-vs-nps"
+              element={<MfVsNpsPage />}
             />
             <Route
               path="/data-management"

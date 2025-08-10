@@ -15,6 +15,8 @@ import {
   Calculator,
   Sparkles,
   Gift,
+  BookOpen,
+  GitCompare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -26,6 +28,7 @@ const Sidebar = () => {
   const [isCapitalGainsOpen, setIsCapitalGainsOpen] = useState(false);
   const [isDividendsOpen, setIsDividendsOpen] = useState(false);
   const [isTaxSectionsOpen, setIsTaxSectionsOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
 
   const mainNavLinkClass = (isActive: boolean) =>
     cn(
@@ -151,6 +154,23 @@ const Sidebar = () => {
             <NavLink to="/section-54f" className={subNavLinkClass}>
               <FileText className="mr-3 h-4 w-4" />
               Section 54F
+            </NavLink>
+          </CollapsibleContent>
+        </Collapsible>
+
+        <Collapsible open={isToolsOpen} onOpenChange={setIsToolsOpen} className="space-y-1 pt-2">
+          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tools</p>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", isToolsOpen && "rotate-180")} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1">
+            <NavLink to="/investment-diary" className={subNavLinkClass}>
+              <BookOpen className="mr-3 h-4 w-4" />
+              Investment Diary
+            </NavLink>
+            <NavLink to="/mf-vs-nps" className={subNavLinkClass}>
+              <GitCompare className="mr-3 h-4 w-4" />
+              MF vs NPS
             </NavLink>
           </CollapsibleContent>
         </Collapsible>
