@@ -1,5 +1,6 @@
 export interface DetailedIncome {
   salary: number;
+  rentalIncome: number;
   fdIncome: number;
   bondIncome: number;
   dividendIncome: number;
@@ -40,7 +41,7 @@ export interface TaxCalculationResult {
 
 export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
   // 1. Calculate tax on income other than capital gains
-  const grossSlabIncome = details.salary + details.fdIncome + details.bondIncome + details.dividendIncome;
+  const grossSlabIncome = details.salary + details.rentalIncome + details.fdIncome + details.bondIncome + details.dividendIncome;
   const standardDeduction = details.isSalaried ? 75000 : 0;
   const netTaxableSlabIncome = Math.max(0, grossSlabIncome - standardDeduction);
 
@@ -77,7 +78,7 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
   const stcgForTax = Math.max(0, postSetOffStcg);
   const ltcgForTax = Math.max(0, postSetOffLtcg);
 
-  const ltcgExemption = 125000;
+  const ltcgExemption = 150000;
   const taxableLtcg = Math.max(0, ltcgForTax - ltcgExemption);
   const ltcgTax = taxableLtcg * 0.125;
   const stcgTax = stcgForTax * 0.20;

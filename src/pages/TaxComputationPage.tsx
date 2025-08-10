@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { calculateTax, TaxCalculationResult } from "@/utils/taxCalculator";
+import { Separator } from "@/components/ui/separator";
 
 // Local storage keys
 const salaryIncomeSource = "dyad-salary-income";
@@ -20,19 +22,18 @@ interface BondItem { income: number | string; }
 interface FdItem { interest: number | string; }
 interface RentalProperty { monthlyRent: number | string; monthsRented: number | string; propertyTax: number | string; }
 
+const BreakdownRow: React.FC<{ label: string; value: number; isNegative?: boolean; className?: string }> = ({ label, value, isNegative = false, className = "" }) => (
+  <div className={`flex justify-between text-sm ${className}`}>
+    <span>{label}</span>
+    <span className="font-mono">{isNegative ? '-' : ''} ₹{value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+  </div>
+);
+
 const TaxComputationPage: React.FC = () => {
-  const [income, setIncome] = useState({
-    salary: 0,
-    rental: 0,
-    fd: 0,
-    bond: 0,
-    dividend: 0,
-  });
-  const [capitalGains, setCapitalGains] = useState({ stcg: 0, ltcg: 0 });
+  const [taxDetails, setTaxDetails] = useState<TaxCalculationResult | null>(null);
 
   useEffect(() => {
     const calculateTotals = () => {
-      // --- Income from other sources ---
       const salary = Number(JSON.parse(localStorage.getItem(salaryIncomeSource) || "0"));
       
       const rentalData: RentalProperty[] = JSON.parse(localStorage.getItem(rentalIncomeSource) || "[]");
@@ -55,14 +56,22 @@ const TaxComputationPage: React.FC = () => {
         return total + data.reduce((sum, item) => sum + (item.amount || 0), 0);
       }, 0);
 
-      setIncome({ salary, rental, fd, bond, dividend });
-
-      // --- Capital Gains ---
       const dematData: CapitalGainsItem[] = JSON.parse(localStorage.getItem(DEMAT_KEY) || "[]");
       const mfData: CapitalGainsItem[] = JSON.parse(localStorage.getItem(MF_KEY) || "[]");
-      const totalStcg = [...dematData, ...mfData].reduce((sum, item) => sum + (Number(item.stcg) || 0), 0);
-      const totalLtcg = [...dematData, ...mfData].reduce((sum, item) => sum + (Number(item.ltcg) || 0), 0);
-      setCapitalGains({ stcg: totalStcg, ltcg: totalLtcg });
+      const stcg = [...dematData, ...mfData].reduce((sum, item) => sum + (Number(item.stcg) || 0), 0);
+      const ltcg = [...dematData, ...mfData].reduce((sum, item) => sum + (Number(item.ltcg) || 0), 0);
+
+      const result = calculateTax({
+        salary,
+        rentalIncome: rental,
+        fdIncome: fd,
+        bondIncome: bond,
+        dividendIncome: dividend,
+        stcg,
+        ltcg,
+        isSalaried: salary > 0,
+      });
+      setTaxDetails(result);
     };
 
     calculateTotals();
@@ -74,95 +83,81 @@ const TaxComputationPage: React.FC = () => {
     };
   }, []);
 
-  // --- Tax Calculation Logic ---
-  const grossTotalIncome = Object.values(income).reduce((sum, val) => sum + val, 0);
-  const standardDeduction = income.salary > 0 ? 75000 : 0;
-  const netTaxableIncome = Math.max(0, grossTotalIncome - standardDeduction);
-
-  const rebateIncomeLimit = 1200000;
-  const hasRebate = netTaxableIncome <= rebateIncomeLimit;
-
-  const calculateSlabTax = (inc: number) => {
-    if (inc <= 400000) return 0;
-    let tax = 0;
-    if (inc > 400000)  tax += (Math.min(inc, 800000) - 400000) * 0.05;
-    if (inc > 800000)  tax += (Math.min(inc, 1200000) - 800000) * 0.10;
-    if (inc > 1200000) tax += (Math.min(inc, 1600000) - 1200000) * 0.15;
-    if (inc > 1600000) tax += (Math.min(inc, 2000000) - 1600000) * 0.20;
-    if (inc > 2000000) tax += (Math.min(inc, 2400000) - 2000000) * 0.25;
-    if (inc > 2400000) tax += (inc - 2400000) * 0.30;
-    return tax;
-  };
-
-  const incomeTaxBeforeRebate = hasRebate ? 0 : calculateSlabTax(netTaxableIncome);
-  const surcharge = netTaxableIncome > 5000000 ? incomeTaxBeforeRebate * 0.10 : 0; // Simplified surcharge
-  const taxBeforeCess = incomeTaxBeforeRebate + surcharge;
-  const cess = taxBeforeCess * 0.04;
-  const totalIncomeTax = taxBeforeCess + cess;
-
-  // Capital Gains Tax (using rates from CapitalGainsPage for consistency)
-  const ltcgExemption = 150000;
-  const taxableLtcg = Math.max(0, capitalGains.ltcg - ltcgExemption);
-  const ltcgTax = taxableLtcg * 0.125;
-  const stcgTax = capitalGains.stcg * 0.20;
-  const totalCapitalGainsTax = ltcgTax + stcgTax;
-
-  const totalTaxPayable = totalIncomeTax + totalCapitalGainsTax;
-
-  const f = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (!taxDetails) {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <p>Loading tax computation...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-gray-50">
           Tax Computation (New Regime)
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>1. Income Calculation</CardTitle></CardHeader>
+            <CardHeader><CardTitle>1. Income Tax (Slab Regime)</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex justify-between"><span>Salary Income:</span> <span className="font-mono">₹{f(income.salary)}</span></div>
-              <div className="flex justify-between"><span>Rental Income:</span> <span className="font-mono">₹{f(income.rental)}</span></div>
-              <div className="flex justify-between"><span>FD & Bond Interest:</span> <span className="font-mono">₹{f(income.fd + income.bond)}</span></div>
-              <div className="flex justify-between"><span>Dividend Income:</span> <span className="font-mono">₹{f(income.dividend)}</span></div>
-              <hr />
-              <div className="flex justify-between font-bold"><span>Gross Total Income:</span> <span className="font-mono">₹{f(grossTotalIncome)}</span></div>
-              <div className="flex justify-between"><span>Less: Standard Deduction:</span> <span className="font-mono">- ₹{f(standardDeduction)}</span></div>
-              <hr />
-              <div className="flex justify-between font-bold text-lg"><span>Net Taxable Income:</span> <span className="font-mono">₹{f(netTaxableIncome)}</span></div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>2. Income Tax Calculation</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              {hasRebate && (
-                <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
+              {taxDetails.isRebateApplicable && (
+                <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 mb-4">
                   <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <AlertTitle className="text-green-800 dark:text-green-300">Rebate under Section 87A Applicable</AlertTitle>
                   <AlertDescription className="text-green-700 dark:text-green-400">
-                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero. With the standard deduction, this can push your "tax-free" limit to ₹12,75,000.
+                    Your taxable income is ₹12,00,000 or less, so your income tax liability is zero.
                   </AlertDescription>
                 </Alert>
               )}
-              <div className="flex justify-between"><span>Tax on Income (as per slabs):</span> <span className="font-mono">₹{f(incomeTaxBeforeRebate)}</span></div>
-              <div className="flex justify-between"><span>Surcharge:</span> <span className="font-mono">+ ₹{f(surcharge)}</span></div>
-              <hr />
-              <div className="flex justify-between"><span>Tax Before Cess:</span> <span className="font-mono">₹{f(taxBeforeCess)}</span></div>
-              <div className="flex justify-between"><span>Health & Education Cess (4%):</span> <span className="font-mono">+ ₹{f(cess)}</span></div>
-              <hr />
-              <div className="flex justify-between font-bold text-lg"><span>Total Income Tax Payable:</span> <span className="font-mono">₹{f(totalIncomeTax)}</span></div>
+              <BreakdownRow label="Gross Income (excl. Capital Gains)" value={taxDetails.grossSlabIncome} />
+              <BreakdownRow label="Standard Deduction" value={taxDetails.standardDeduction} isNegative />
+              <Separator />
+              <BreakdownRow label="Net Taxable Income" value={taxDetails.netTaxableSlabIncome} className="font-medium" />
+              <BreakdownRow label="Tax on Income" value={taxDetails.slabTaxBeforeRebate} />
+              <BreakdownRow label="Surcharge" value={taxDetails.surcharge} />
+              <BreakdownRow label="Cess (4%)" value={taxDetails.cess} />
+              <Separator />
+              <BreakdownRow label="Total Income Tax" value={taxDetails.totalIncomeTax} className="font-bold text-base" />
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2">
+          <Card>
+            <CardHeader><CardTitle>2. Capital Gains Tax</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {taxDetails.stclSetOff > 0 && (
+                  <Alert variant="default" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 mb-4">
+                    <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <AlertTitle className="text-blue-800 dark:text-blue-300">Loss Set-Off Applied</AlertTitle>
+                    <AlertDescription className="text-blue-700 dark:text-blue-400">
+                      A short-term loss of ₹{taxDetails.stclSetOff.toLocaleString("en-IN")} has been set off against long-term gains.
+                    </AlertDescription>
+                  </Alert>
+              )}
+              <BreakdownRow label="Taxable STCG" value={Math.max(0, taxDetails.postSetOffStcg)} />
+              <BreakdownRow label="Tax on STCG @ 20%" value={taxDetails.stcgTax} />
+              <Separator />
+              <BreakdownRow label="Taxable LTCG (after set-off)" value={Math.max(0, taxDetails.postSetOffLtcg)} />
+              <BreakdownRow label="Exemption" value={taxDetails.ltcgExemption} isNegative />
+              <BreakdownRow label="Tax on LTCG @ 12.5%" value={taxDetails.ltcgTax} />
+              <Separator />
+              <BreakdownRow label="Total Capital Gains Tax" value={taxDetails.totalCapitalGainsTax} className="font-bold text-base" />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary/5 dark:bg-primary/10">
             <CardHeader><CardTitle>3. Final Tax Liability</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex justify-between"><span>Total Income Tax:</span> <span className="font-mono">₹{f(totalIncomeTax)}</span></div>
-              <div className="flex justify-between"><span>Total Capital Gains Tax:</span> <span className="font-mono">+ ₹{f(totalCapitalGainsTax)}</span></div>
-              <hr />
-              <div className="flex justify-between font-bold text-2xl"><span>Total Tax Payable:</span> <span className="font-mono">₹{f(totalTaxPayable)}</span></div>
+              <BreakdownRow label="Total Income Tax" value={taxDetails.totalIncomeTax} className="text-base" />
+              <BreakdownRow label="Total Capital Gains Tax" value={taxDetails.totalCapitalGainsTax} className="text-base" />
+              <Separator />
+              <div className="flex justify-between text-xl font-bold pt-2">
+                <span>Total Tax Payable</span>
+                <span className="font-mono">₹{taxDetails.totalTaxPayable.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
             </CardContent>
           </Card>
         </div>
