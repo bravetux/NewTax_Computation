@@ -9,13 +9,13 @@ import { Separator } from '@/components/ui/separator';
 
 // State for inputs
 interface MfInputs {
-  monthlyInvestment: string;
+  yearlyInvestment: string;
   investmentHorizon: string;
   mfReturn: string;
 }
 
 interface NpsInputs {
-  monthlyInvestment: string;
+  yearlyInvestment: string;
   investmentHorizon: string;
   npsReturn: string;
   annuityRate: string;
@@ -37,13 +37,13 @@ interface NpsResult {
 
 const MfVsNpsPage: React.FC = () => {
   const [mfInputs, setMfInputs] = useState<MfInputs>({
-    monthlyInvestment: '10000',
+    yearlyInvestment: '120000',
     investmentHorizon: '30',
     mfReturn: '12',
   });
 
   const [npsInputs, setNpsInputs] = useState<NpsInputs>({
-    monthlyInvestment: '10000',
+    yearlyInvestment: '120000',
     investmentHorizon: '30',
     npsReturn: '10',
     annuityRate: '6',
@@ -62,15 +62,13 @@ const MfVsNpsPage: React.FC = () => {
 
   const handleCompare = () => {
     // MF Calculation
-    const P_mf = parseFloat(mfInputs.monthlyInvestment) || 0;
+    const P_mf = parseFloat(mfInputs.yearlyInvestment) || 0;
     const t_mf = parseFloat(mfInputs.investmentHorizon) || 0;
     const r_mf = (parseFloat(mfInputs.mfReturn) || 0) / 100;
-    const n = 12;
 
     if (P_mf > 0 && t_mf > 0) {
-      const totalInvested_mf = P_mf * n * t_mf;
-      const i_mf = r_mf / n;
-      const mfFutureValue = P_mf * (((Math.pow(1 + i_mf, n * t_mf) - 1) / i_mf) * (1 + i_mf));
+      const totalInvested_mf = P_mf * t_mf;
+      const mfFutureValue = P_mf * (((Math.pow(1 + r_mf, t_mf) - 1) / r_mf) * (1 + r_mf));
       const mfGains = mfFutureValue - totalInvested_mf;
       const mfTax = mfGains * 0.1;
       const mfPostTaxCorpus = mfFutureValue - mfTax;
@@ -84,14 +82,13 @@ const MfVsNpsPage: React.FC = () => {
     }
 
     // NPS Calculation
-    const P_nps = parseFloat(npsInputs.monthlyInvestment) || 0;
+    const P_nps = parseFloat(npsInputs.yearlyInvestment) || 0;
     const t_nps = parseFloat(npsInputs.investmentHorizon) || 0;
     const r_nps = (parseFloat(npsInputs.npsReturn) || 0) / 100;
     const r_annuity = (parseFloat(npsInputs.annuityRate) || 0) / 100;
 
     if (P_nps > 0 && t_nps > 0) {
-      const i_nps = r_nps / n;
-      const npsFutureValue = P_nps * (((Math.pow(1 + i_nps, n * t_nps) - 1) / i_nps) * (1 + i_nps));
+      const npsFutureValue = P_nps * (((Math.pow(1 + r_nps, t_nps) - 1) / r_nps) * (1 + r_nps));
       const npsLumpSum = npsFutureValue * 0.6;
       const npsAnnuityAmount = npsFutureValue * 0.4;
       const monthlyPension = (npsAnnuityAmount * r_annuity) / 12;
@@ -130,8 +127,8 @@ const MfVsNpsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="mf-monthly-investment">Monthly Investment (₹)</Label>
-                <Input id="mf-monthly-investment" type="number" value={mfInputs.monthlyInvestment} onChange={e => handleMfInputChange('monthlyInvestment', e.target.value)} />
+                <Label htmlFor="mf-yearly-investment">Yearly Investment (₹)</Label>
+                <Input id="mf-yearly-investment" type="number" value={mfInputs.yearlyInvestment} onChange={e => handleMfInputChange('yearlyInvestment', e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="mf-investment-horizon">Investment Horizon (Years)</Label>
@@ -149,8 +146,8 @@ const MfVsNpsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="nps-monthly-investment">Monthly Investment (₹)</Label>
-                <Input id="nps-monthly-investment" type="number" value={npsInputs.monthlyInvestment} onChange={e => handleNpsInputChange('monthlyInvestment', e.target.value)} />
+                <Label htmlFor="nps-yearly-investment">Yearly Investment (₹)</Label>
+                <Input id="nps-yearly-investment" type="number" value={npsInputs.yearlyInvestment} onChange={e => handleNpsInputChange('yearlyInvestment', e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="nps-investment-horizon">Investment Horizon (Years)</Label>
