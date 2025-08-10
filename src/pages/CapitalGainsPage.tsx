@@ -58,7 +58,7 @@ const CapitalGainsPage: React.FC = () => {
   const totalStcg = dematStcg + mfStcg;
   const totalLtcg = dematLtcg + mfLtcg;
 
-  const ltcgExemption = 150000;
+  const ltcgExemption = 125000;
   const taxableLtcg = Math.max(0, totalLtcg - ltcgExemption);
   const ltcgTax = taxableLtcg * 0.125;
   const stcgTax = totalStcg * 0.20;

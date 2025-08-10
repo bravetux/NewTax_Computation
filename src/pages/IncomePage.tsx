@@ -100,7 +100,7 @@ const IncomePage: React.FC = () => {
       setTotalStcg(totalStcg);
       setTotalLtcg(totalLtcg);
 
-      const ltcgExemption = 150000;
+      const ltcgExemption = 125000;
       const taxableLtcg = Math.max(0, totalLtcg - ltcgExemption);
       const ltcgTax = taxableLtcg * 0.125;
       const stcgTax = totalStcg * 0.20;

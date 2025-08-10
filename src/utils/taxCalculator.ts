@@ -78,7 +78,7 @@ export const calculateTax = (details: DetailedIncome): TaxCalculationResult => {
   const stcgForTax = Math.max(0, postSetOffStcg);
   const ltcgForTax = Math.max(0, postSetOffLtcg);
 
-  const ltcgExemption = 150000;
+  const ltcgExemption = 125000;
   const taxableLtcg = Math.max(0, ltcgForTax - ltcgExemption);
   const ltcgTax = taxableLtcg * 0.125;
   const stcgTax = stcgForTax * 0.20;
